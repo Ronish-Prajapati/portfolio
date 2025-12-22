@@ -83,7 +83,7 @@ const Header = () => {
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-border bg-background animate-fade-in">
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 px-4">
               {navLinks.map((link) => (
                 <a
                   key={link.href}
