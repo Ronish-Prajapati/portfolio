@@ -81,25 +81,70 @@ const Header = () => {
         </nav>
 
         {/* Mobile Navigation */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-border bg-background animate-fade-in">
-            <div className="flex flex-col gap-4 px-4">
-              {navLinks.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {link.label}
-                </a>
-              ))}
-              <Button variant="default" size="sm" className="w-fit" asChild>
-                <a href="mailto:ronishprajapati0@gmail.com">Hire Me</a>
-              </Button>
-            </div>
+       {isMobileMenuOpen && (
+  <>
+    {/* 🔵 HERO MENU (Homepage + Not Scrolled) */}
+    {!isScrolled && isHomePage ? (
+      <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm animate-fade-in">
+        
+        <div className="absolute top-0 left-0 w-full h-full px-6 py-8 flex flex-col text-white">
+          
+          {/* Top */}
+          <div className="flex justify-between items-center mb-10">
+            <span className="text-xl font-bold">
+              Ronish<span className="text-accent">.</span>
+            </span>
+            <button onClick={() => setIsMobileMenuOpen(false)}>
+              <X size={26} />
+            </button>
           </div>
-        )}
+
+          {/* Links */}
+          <div className="flex flex-col gap-6 text-lg">
+            {navLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-white/80 hover:text-white transition"
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
+
+          <div className="flex-grow" />
+
+          {/* CTA */}
+          <Button className="w-full mt-10 bg-white text-black hover:bg-white/90">
+            Hire Me
+          </Button>
+        </div>
+      </div>
+    ) : (
+      
+      /* ⚪ NORMAL MENU (Scrolled or Other Pages) */
+      <div className="md:hidden py-4 border-t border-border bg-background animate-fade-in">
+        <div className="flex flex-col gap-4 px-4">
+          {navLinks.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition"
+            >
+              {link.label}
+            </a>
+          ))}
+
+          <Button variant="default" size="sm" className="w-fit" asChild>
+            <a href="mailto:ronishprajapati0@gmail.com">Hire Me</a>
+          </Button>
+        </div>
+      </div>
+    )}
+  </>
+)}
       </div>
     </header>
   );
