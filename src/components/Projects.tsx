@@ -3,7 +3,7 @@ import { ArrowRight, ExternalLink, Github } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import projectPTS from "@/assets/pts.png";
 import projectCurlyBelle from "@/assets/curly.png";
-import projectHippyDesk from "@/assets/hippy.png";
+import projectSoheto from "@/assets/soheto.png";
 
 export interface Project {
   id: string;
@@ -62,30 +62,31 @@ export const projectsData: Project[] = [
       "Challani, lot management, and stock adjustment modules",
       "Warehousing and ledger tracking system",
     ],
-    liveUrl: "https://apicamera.waveplus.com.np",
+    liveUrl: "https://curlybelleco.com/",
     githubUrl: "",
     year: "2025",
   },
-  {
-    id: "hippy-desk-coworking-platform",
-    title: "Hippy Desk – Coworking Platform",
-    description:
-      "A coworking space listing and management platform for browsing, booking, and managing workspaces.",
-    longDescription:
-      "A modern coworking platform built with React and TypeScript that allows users to browse, book, and manage coworking spaces. The application focuses on clean UI, responsive design, and smooth user interactions. I contributed to building frontend features and interfaces that ensure an intuitive booking and management experience.",
-    image: projectHippyDesk,
-    technologies: ["React", "TypeScript", "Tailwind CSS"],
-    features: [
-      "Workspace listing and detailed space pages",
-      "Booking and availability management",
-      "Responsive and user-friendly UI",
-      "Optimized performance for real-world users",
-      "Clean component-based architecture",
-    ],
-    liveUrl: "https://www.hippydesk.com",
-    githubUrl: "",
-    year: "2024",
-  },
+ {
+  id: "soheto-ecommerce-platform",
+  title: "Soheto – E-commerce Platform",
+  description:
+    "A fully functional e-commerce platform developed for Soheto with integrated inventory and order management.",
+  longDescription:
+    "A modern and scalable e-commerce platform developed for Soheto. Built using Laravel and React, the system delivers a fast, secure, and user-friendly shopping experience. It includes a powerful inventory management system with real-time stock tracking, seamless product and order handling, and a responsive UI optimized for performance and SEO.",
+  image: projectSoheto,
+  technologies: ["Laravel", "React", "MySQL", "Tailwind CSS"],
+  features: [
+    "Custom Laravel + React development",
+    "Fully functional e-commerce store",
+    "Inventory management system",
+    "Product and order management",
+    "Real-time stock tracking",
+    "Mobile-friendly and SEO optimized",
+  ],
+  liveUrl: "https://soheto.com.np",
+  githubUrl: "",
+  year: "2025",
+}
 ];
 
 
