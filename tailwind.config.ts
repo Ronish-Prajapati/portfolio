@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['DM Sans', 'system-ui', 'sans-serif'],
-        mono: ['Space Mono', 'monospace'],
+        sans: ['var(--font-sans)', 'DM Sans', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-mono)', 'Space Mono', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",
