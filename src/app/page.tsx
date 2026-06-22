@@ -4,6 +4,7 @@ import About from "@/components/sections/About";
 import Experience from "@/components/sections/Experience";
 import Projects from "@/components/sections/Projects";
 import Education from "@/components/sections/Education";
+import Gallery from "@/components/sections/Gallery";
 import Testimonials from "@/components/sections/Testimonials";
 import Contact from "@/components/sections/Contact";
 import Footer from "@/components/sections/Footer";
@@ -13,6 +14,7 @@ import {
   getSkills,
   getExperiences,
   getEducation,
+  getGallery,
   getTestimonials,
 } from "@/lib/queries";
 
@@ -20,14 +22,16 @@ import {
 export const revalidate = 3600;
 
 export default async function HomePage() {
-  const [profile, skills, experiences, projects, education, testimonials] = await Promise.all([
-    getProfile(),
-    getSkills(),
-    getExperiences(),
-    getProjects(),
-    getEducation(),
-    getTestimonials(),
-  ]);
+  const [profile, skills, experiences, projects, education, gallery, testimonials] =
+    await Promise.all([
+      getProfile(),
+      getSkills(),
+      getExperiences(),
+      getProjects(),
+      getEducation(),
+      getGallery(),
+      getTestimonials(),
+    ]);
 
   return (
     <main className="min-h-screen">
@@ -37,6 +41,7 @@ export default async function HomePage() {
       <Experience experiences={experiences} resumeUrl={profile?.resumeUrl} />
       <Projects projects={projects} />
       <Education education={education} />
+      <Gallery images={gallery} />
       <Testimonials testimonials={testimonials} />
       <Contact email={profile?.email} />
       <Footer profile={profile} />

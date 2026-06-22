@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import ImageUpload from "@/components/admin/ImageUpload";
+import RichTextEditor from "@/components/admin/RichTextEditor";
 
 interface ResourceFormProps {
   fields: FieldConfig[];
@@ -53,6 +54,18 @@ export default function ResourceForm({
         if (field.type === "image") {
           return (
             <ImageUpload
+              key={field.name}
+              name={field.name}
+              label={field.label}
+              defaultValue={toStringValue(value)}
+              help={field.help}
+            />
+          );
+        }
+
+        if (field.type === "editor") {
+          return (
+            <RichTextEditor
               key={field.name}
               name={field.name}
               label={field.label}

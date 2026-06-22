@@ -10,6 +10,7 @@ import {
   GraduationCap,
   FileText,
   MessageSquareQuote,
+  Images,
   Inbox,
   UserCog,
   LogOut,
@@ -25,6 +26,7 @@ const navItems = [
   { href: "/admin/education", label: "Education", icon: GraduationCap },
   { href: "/admin/blogs", label: "Blogs", icon: FileText },
   { href: "/admin/testimonials", label: "Testimonials", icon: MessageSquareQuote },
+  { href: "/admin/gallery", label: "Gallery", icon: Images },
   { href: "/admin/about", label: "About / Profile", icon: UserCog },
   { href: "/admin/messages", label: "Messages", icon: Inbox },
 ];

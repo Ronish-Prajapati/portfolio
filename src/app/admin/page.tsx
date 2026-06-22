@@ -6,13 +6,14 @@ import {
   GraduationCap,
   FileText,
   MessageSquareQuote,
+  Images,
   Inbox,
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
 async function getCounts() {
   try {
-    const [projects, skills, experience, education, blogs, testimonials, messages, unread] =
+    const [projects, skills, experience, education, blogs, testimonials, gallery, messages, unread] =
       await Promise.all([
         prisma.project.count(),
         prisma.skill.count(),
@@ -20,10 +21,11 @@ async function getCounts() {
         prisma.education.count(),
         prisma.blog.count(),
         prisma.testimonial.count(),
+        prisma.galleryImage.count(),
         prisma.contactMessage.count(),
         prisma.contactMessage.count({ where: { read: false } }),
       ]);
-    return { projects, skills, experience, education, blogs, testimonials, messages, unread };
+    return { projects, skills, experience, education, blogs, testimonials, gallery, messages, unread };
   } catch {
     return {
       projects: 0,
@@ -32,6 +34,7 @@ async function getCounts() {
       education: 0,
       blogs: 0,
       testimonials: 0,
+      gallery: 0,
       messages: 0,
       unread: 0,
     };
@@ -53,6 +56,7 @@ export default async function AdminDashboard() {
       value: counts.testimonials,
       icon: MessageSquareQuote,
     },
+    { href: "/admin/gallery", label: "Gallery", value: counts.gallery, icon: Images },
   ];
 
   return (

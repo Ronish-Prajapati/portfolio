@@ -18,6 +18,7 @@ const delegates: Record<string, Delegate> = {
   education: prisma.education as unknown as Delegate,
   blogs: prisma.blog as unknown as Delegate,
   testimonials: prisma.testimonial as unknown as Delegate,
+  gallery: prisma.galleryImage as unknown as Delegate,
 };
 
 export function getDelegate(key: string): Delegate | null {

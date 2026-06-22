@@ -6,12 +6,14 @@ import {
   educationSchema,
   blogSchema,
   testimonialSchema,
+  gallerySchema,
 } from "@/lib/validations";
 
 export type FieldType =
   | "text"
   | "textarea"
   | "richtext"
+  | "editor"
   | "number"
   | "boolean"
   | "list"
@@ -78,7 +80,7 @@ export const resources: Record<string, ResourceConfig> = {
         name: "features",
         label: "Key Features",
         type: "list",
-        help: "One per line (or comma separated).",
+        help: "One feature per line.",
       },
       { name: "liveLink", label: "Live URL", type: "url" },
       { name: "githubLink", label: "GitHub URL", type: "url" },
@@ -129,8 +131,8 @@ export const resources: Record<string, ResourceConfig> = {
       { name: "location", label: "Location", type: "text" },
       { name: "period", label: "Period", type: "text", help: 'e.g. "July 2024 - Present"' },
       { name: "description", label: "Description", type: "richtext", required: true },
-      { name: "highlights", label: "Key Achievements", type: "list" },
-      { name: "technologies", label: "Technologies", type: "list" },
+      { name: "highlights", label: "Key Achievements", type: "list", help: "One achievement per line." },
+      { name: "technologies", label: "Technologies", type: "list", help: "Comma or newline separated." },
       { name: "current", label: "Current Role", type: "boolean" },
       { name: "order", label: "Order", type: "number" },
     ],
@@ -167,8 +169,8 @@ export const resources: Record<string, ResourceConfig> = {
     fields: [
       { name: "title", label: "Title", type: "text", required: true },
       { name: "slug", label: "Slug", type: "text", required: true },
-      { name: "excerpt", label: "Excerpt", type: "textarea" },
-      { name: "content", label: "Content", type: "richtext", required: true },
+      { name: "excerpt", label: "Excerpt", type: "textarea", help: "Short summary shown on the blog list." },
+      { name: "content", label: "Content", type: "editor", required: true },
       { name: "thumbnail", label: "Thumbnail", type: "image" },
       { name: "published", label: "Published", type: "boolean" },
     ],
@@ -189,6 +191,23 @@ export const resources: Record<string, ResourceConfig> = {
       { name: "message", label: "Message", type: "textarea", required: true },
       { name: "image", label: "Photo", type: "image" },
       { name: "order", label: "Order", type: "number" },
+    ],
+  },
+  gallery: {
+    key: "gallery",
+    label: "Gallery",
+    singular: "Gallery Image",
+    schema: gallerySchema,
+    revalidate: ["/"],
+    listColumns: [
+      { key: "title", label: "Title" },
+      { key: "order", label: "Order" },
+    ],
+    fields: [
+      { name: "image", label: "Image", type: "image", required: true },
+      { name: "title", label: "Title", type: "text" },
+      { name: "caption", label: "Caption", type: "textarea" },
+      { name: "order", label: "Order", type: "number", help: "Lower numbers show first." },
     ],
   },
 };

@@ -3,8 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
-import { getResource, type FieldConfig } from "@/lib/resources";
+import { getResource, type FieldConfig, type ResourceConfig } from "@/lib/resources";
 import { getDelegate } from "@/lib/resource-data";
+import { sanitizeHtml } from "@/lib/validations";
 
 async function requireAuth() {
   const session = await auth();
@@ -23,6 +24,16 @@ function buildData(fields: FieldConfig[], formData: FormData): Record<string, un
       // Zod handles coercion + array splitting.
       const v = formData.get(field.name);
       data[field.name] = v === null ? "" : v;
+    }
+  }
+  return data;
+}
+
+/** Sanitize any rich-text (`editor`) fields in the parsed data before storage. */
+function sanitizeEditorFields(resource: ResourceConfig, data: Record<string, unknown>) {
+  for (const field of resource.fields) {
+    if (field.type === "editor" && typeof data[field.name] === "string") {
+      data[field.name] = sanitizeHtml(data[field.name] as string);
     }
   }
   return data;
@@ -51,7 +62,7 @@ export async function createResourceAction(
   }
 
   try {
-    await delegate.create({ data: parsed.data });
+    await delegate.create({ data: sanitizeEditorFields(resource, parsed.data as Record<string, unknown>) });
   } catch (error) {
     console.error(`[${key}] create failed:`, error);
     return { error: "Could not save. A unique field (e.g. slug) may already exist." };
@@ -78,7 +89,10 @@ export async function updateResourceAction(
   }
 
   try {
-    await delegate.update({ where: { id }, data: parsed.data });
+    await delegate.update({
+      where: { id },
+      data: sanitizeEditorFields(resource, parsed.data as Record<string, unknown>),
+    });
   } catch (error) {
     console.error(`[${key}] update failed:`, error);
     return { error: "Could not save. A unique field (e.g. slug) may already exist." };

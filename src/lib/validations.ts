@@ -2,11 +2,28 @@ import { z } from "zod";
 
 // Helpers ---------------------------------------------------------------------
 
-/** Accepts either a real array of strings or a comma / newline separated string. */
+/**
+ * Tag-style fields: split on commas OR newlines. Use for short items
+ * (technologies, tech stack) where each value is a word/short phrase.
+ */
 const stringArray = z
   .union([z.array(z.string()), z.string()])
   .transform((val) =>
     (Array.isArray(val) ? val : val.split(/[\n,]/))
+      .map((s) => s.trim())
+      .filter(Boolean),
+  )
+  .pipe(z.array(z.string()));
+
+/**
+ * Line-style fields: split on NEWLINES ONLY (one item per line). Use for
+ * sentences/paragraphs/bullets that naturally contain commas
+ * (about paragraphs, experience highlights, project features).
+ */
+const lineArray = z
+  .union([z.array(z.string()), z.string()])
+  .transform((val) =>
+    (Array.isArray(val) ? val : val.split(/\r?\n/))
       .map((s) => s.trim())
       .filter(Boolean),
   )
@@ -35,7 +52,7 @@ export const profileSchema = z.object({
   title: z.string().min(1, "Title is required"),
   shortDescription: z.string().min(1, "Short description is required"),
   about: z.string().min(1, "About is required"),
-  aboutParagraphs: stringArray.optional().default([]),
+  aboutParagraphs: lineArray.optional().default([]),
   techStack: stringArray.optional().default([]),
   profileImage: z.string().optional().nullable(),
   resumeUrl: z.string().optional().nullable(),
@@ -65,7 +82,7 @@ export const projectSchema = z.object({
   githubLink: z.string().optional().nullable(),
   liveLink: z.string().optional().nullable(),
   technologies: stringArray.optional().default([]),
-  features: stringArray.optional().default([]),
+  features: lineArray.optional().default([]),
   year: z.string().optional().nullable(),
   featured: z.coerce.boolean().optional().default(false),
   order: z.coerce.number().int().optional().default(0),
@@ -92,7 +109,7 @@ export const experienceSchema = z.object({
   location: z.string().optional().nullable(),
   period: z.string().optional().nullable(),
   description: z.string().min(1, "Description is required"),
-  highlights: stringArray.optional().default([]),
+  highlights: lineArray.optional().default([]),
   technologies: stringArray.optional().default([]),
   current: z.coerce.boolean().optional().default(false),
   order: z.coerce.number().int().optional().default(0),
@@ -137,6 +154,16 @@ export const testimonialSchema = z.object({
 });
 export type TestimonialInput = z.infer<typeof testimonialSchema>;
 
+// Gallery ---------------------------------------------------------------------
+
+export const gallerySchema = z.object({
+  title: z.string().optional().nullable(),
+  image: z.string().min(1, "An image is required"),
+  caption: z.string().optional().nullable(),
+  order: z.coerce.number().int().optional().default(0),
+});
+export type GalleryInput = z.infer<typeof gallerySchema>;
+
 // Contact ---------------------------------------------------------------------
 
 export const contactSchema = z.object({
@@ -147,6 +174,21 @@ export const contactSchema = z.object({
   website: z.string().max(0, "Spam detected").optional().default(""),
 });
 export type ContactInput = z.infer<typeof contactSchema>;
+
+/**
+ * Lightweight HTML sanitizer for rich-text content produced by the admin editor.
+ * Tiptap's StarterKit only emits safe tags, but we still strip script/style,
+ * inline event handlers and javascript: URLs as defense in depth before storing.
+ */
+export function sanitizeHtml(input: string): string {
+  return input
+    .replace(/<\s*(script|style|iframe|object|embed)[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/gi, "")
+    .replace(/<\s*(script|style|iframe|object|embed)[^>]*\/?\s*>/gi, "")
+    .replace(/\son\w+\s*=\s*"[^"]*"/gi, "")
+    .replace(/\son\w+\s*=\s*'[^']*'/gi, "")
+    .replace(/\son\w+\s*=\s*[^\s>]+/gi, "")
+    .replace(/(href|src)\s*=\s*("|')\s*javascript:[^"']*\2/gi, '$1=$2#$2');
+}
 
 /** Generate a URL-safe slug from a title. */
 export function slugify(input: string): string {

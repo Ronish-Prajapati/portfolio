@@ -60,6 +60,10 @@ export function getTestimonials() {
   return safe(() => prisma.testimonial.findMany({ orderBy: { order: "asc" } }), []);
 }
 
+export function getGallery() {
+  return safe(() => prisma.galleryImage.findMany({ orderBy: { order: "asc" } }), []);
+}
+
 export function getPublishedBlogs() {
   return safe(
     () => prisma.blog.findMany({ where: { published: true }, orderBy: { createdAt: "desc" } }),
