@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, CalendarDays, Clock } from "lucide-react";
 import Header from "@/components/sections/Header";
 import Footer from "@/components/sections/Footer";
+import BlogGallery from "@/components/blog/BlogGallery";
 import { getBlogBySlug, getPublishedBlogs, getProfile } from "@/lib/queries";
 import { siteConfig } from "@/lib/site";
 import { readingTime, formatDate, looksLikeHtml } from "@/lib/format";
@@ -29,6 +30,7 @@ export async function generateMetadata({
   return {
     title: blog.title,
     description: blog.excerpt ?? blog.title,
+    alternates: { canonical: `/blog/${blog.slug}` },
     openGraph: {
       title: blog.title,
       description: blog.excerpt ?? blog.title,
@@ -129,6 +131,9 @@ export default async function BlogPostPage({
               ))}
             </div>
           )}
+
+          {/* Per-post photo gallery (travel & culture imagery) */}
+          <BlogGallery images={blog.images} />
         </div>
       </article>
 

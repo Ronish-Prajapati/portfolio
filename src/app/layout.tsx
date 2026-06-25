@@ -27,16 +27,26 @@ export const metadata: Metadata = {
     template: `%s — ${siteConfig.name}`,
   },
   description: siteConfig.description,
+  applicationName: siteConfig.name,
   keywords: [
     "Ronish Prajapati",
+    "Ronish",
+    "Prajapati",
+    "Ronish Prajapati portfolio",
+    "Ronish Prajapati developer",
     "Frontend Developer",
     "React Developer",
-    "TypeScript",
-    "Next.js",
+    "TypeScript Developer",
+    "Next.js Developer",
     "Web Developer Nepal",
+    "Frontend Developer Nepal",
   ],
   authors: [{ name: siteConfig.name, url: siteConfig.url }],
   creator: siteConfig.name,
+  publisher: siteConfig.name,
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -50,7 +60,20 @@ export const metadata: Metadata = {
     title: siteConfig.title,
     description: siteConfig.description,
   },
-  robots: { index: true, follow: true },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  verification: siteConfig.googleVerification
+    ? { google: siteConfig.googleVerification }
+    : undefined,
   icons: { icon: "/favicon.png", shortcut: "/favicon.ico" },
 };
 
@@ -59,18 +82,46 @@ export default async function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const profile = await getProfile();
 
-  // Person JSON-LD for rich results.
+  // Person + WebSite JSON-LD for rich results and knowledge-panel signals.
+  const personId = `${siteConfig.url}/#person`;
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Person",
-    name: profile?.name ?? siteConfig.name,
-    jobTitle: profile?.title ?? "Frontend Developer",
-    url: siteConfig.url,
-    email: profile?.email ?? siteConfig.links.email,
-    sameAs: [
-      profile?.githubUrl ?? siteConfig.links.github,
-      profile?.linkedinUrl ?? siteConfig.links.linkedin,
-    ].filter(Boolean),
+    "@graph": [
+      {
+        "@type": "Person",
+        "@id": personId,
+        name: profile?.name ?? siteConfig.name,
+        alternateName: "Ronish",
+        jobTitle: profile?.title ?? "Frontend Developer",
+        description: profile?.shortDescription ?? siteConfig.description,
+        url: siteConfig.url,
+        email: profile?.email ?? siteConfig.links.email,
+        image: profile?.profileImage ?? `${siteConfig.url}/opengraph-image`,
+        nationality: "Nepali",
+        knowsAbout: [
+          "Frontend Development",
+          "React",
+          "TypeScript",
+          "Next.js",
+          "Tailwind CSS",
+          "JavaScript",
+          "Web Development",
+        ],
+        sameAs: [
+          profile?.githubUrl ?? siteConfig.links.github,
+          profile?.linkedinUrl ?? siteConfig.links.linkedin,
+        ].filter(Boolean),
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${siteConfig.url}/#website`,
+        url: siteConfig.url,
+        name: siteConfig.name,
+        description: siteConfig.description,
+        publisher: { "@id": personId },
+        inLanguage: "en",
+      },
+    ],
   };
 
   return (

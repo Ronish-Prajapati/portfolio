@@ -11,7 +11,9 @@ export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "Blog",
-  description: "Articles and write-ups on React, TypeScript, and frontend development.",
+  description:
+    "Articles and write-ups by Ronish Prajapati on React, TypeScript, frontend development, travel and culture.",
+  alternates: { canonical: "/blog" },
 };
 
 export default async function BlogPage() {

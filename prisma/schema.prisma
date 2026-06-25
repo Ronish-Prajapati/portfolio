@@ -110,6 +110,7 @@ model Blog {
   excerpt   String?
   content   String   @db.Text
   thumbnail String?
+  images    String[] @default([])
   published Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

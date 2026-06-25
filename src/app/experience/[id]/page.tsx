@@ -26,6 +26,7 @@ export async function generateMetadata({
   return {
     title: `${experience.position} at ${experience.company}`,
     description: experience.description,
+    alternates: { canonical: `/experience/${experience.id}` },
   };
 }
 

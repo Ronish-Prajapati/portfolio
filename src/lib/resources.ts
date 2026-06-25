@@ -18,6 +18,7 @@ export type FieldType =
   | "boolean"
   | "list"
   | "image"
+  | "multiimage"
   | "url";
 
 export interface FieldConfig {
@@ -171,7 +172,13 @@ export const resources: Record<string, ResourceConfig> = {
       { name: "slug", label: "Slug", type: "text", required: true },
       { name: "excerpt", label: "Excerpt", type: "textarea", help: "Short summary shown on the blog list." },
       { name: "content", label: "Content", type: "editor", required: true },
-      { name: "thumbnail", label: "Thumbnail", type: "image" },
+      { name: "thumbnail", label: "Cover Image", type: "image", help: "Main image shown at the top of the post and on the blog list." },
+      {
+        name: "images",
+        label: "Photo Gallery",
+        type: "multiimage",
+        help: "Upload multiple photos to feature in this post (great for travel & culture).",
+      },
       { name: "published", label: "Published", type: "boolean" },
     ],
   },

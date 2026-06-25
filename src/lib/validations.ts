@@ -139,6 +139,7 @@ export const blogSchema = z.object({
   excerpt: z.string().optional().nullable(),
   content: z.string().min(1, "Content is required"),
   thumbnail: z.string().optional().nullable(),
+  images: lineArray.optional().default([]),
   published: z.coerce.boolean().optional().default(false),
 });
 export type BlogInput = z.infer<typeof blogSchema>;

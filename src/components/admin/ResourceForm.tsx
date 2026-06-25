@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import ImageUpload from "@/components/admin/ImageUpload";
+import MultiImageUpload from "@/components/admin/MultiImageUpload";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 
 interface ResourceFormProps {
@@ -58,6 +59,18 @@ export default function ResourceForm({
               name={field.name}
               label={field.label}
               defaultValue={toStringValue(value)}
+              help={field.help}
+            />
+          );
+        }
+
+        if (field.type === "multiimage") {
+          return (
+            <MultiImageUpload
+              key={field.name}
+              name={field.name}
+              label={field.label}
+              defaultValue={Array.isArray(value) ? (value as string[]) : []}
               help={field.help}
             />
           );
