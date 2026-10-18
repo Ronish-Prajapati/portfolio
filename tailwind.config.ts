@@ -16,8 +16,29 @@ export default {
       fontFamily: {
         sans: ['var(--font-sans)', 'DM Sans', 'system-ui', 'sans-serif'],
         mono: ['var(--font-mono)', 'Space Mono', 'monospace'],
+        // Public site ("The Summit") type system.
+        display: ['var(--font-display)', 'Archivo', 'system-ui', 'sans-serif'],
+        body: ['var(--font-body)', 'Geist', 'system-ui', 'sans-serif'],
+        label: ['var(--font-label)', 'Geist Mono', 'ui-monospace', 'monospace'],
       },
       colors: {
+        // Public site palette, sampled from the rendered landscape.
+        night: "rgb(var(--s-night) / <alpha-value>)",
+        forest: {
+          950: "rgb(var(--s-forest-950) / <alpha-value>)",
+          900: "rgb(var(--s-forest-900) / <alpha-value>)",
+          800: "rgb(var(--s-forest-800) / <alpha-value>)",
+          700: "rgb(var(--s-forest-700) / <alpha-value>)",
+        },
+        moss: "rgb(var(--s-moss-600) / <alpha-value>)",
+        sage: "rgb(var(--s-sage-400) / <alpha-value>)",
+        fog: "rgb(var(--s-fog-200) / <alpha-value>)",
+        snow: "rgb(var(--s-snow-50) / <alpha-value>)",
+        ember: {
+          DEFAULT: "rgb(var(--s-ember-400) / <alpha-value>)",
+          light: "rgb(var(--s-ember-300) / <alpha-value>)",
+          deep: "rgb(var(--s-ember-500) / <alpha-value>)",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

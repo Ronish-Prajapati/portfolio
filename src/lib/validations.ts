@@ -81,6 +81,7 @@ export const projectSchema = z.object({
   image: z.string().optional().nullable(),
   githubLink: z.string().optional().nullable(),
   liveLink: z.string().optional().nullable(),
+  role: z.string().trim().max(240, "Keep the role to one short sentence").optional().nullable(),
   technologies: stringArray.optional().default([]),
   features: lineArray.optional().default([]),
   year: z.string().optional().nullable(),

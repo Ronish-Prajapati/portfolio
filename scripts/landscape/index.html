@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Landscape generator</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "/node_modules/three/build/three.module.js",
+          "three/addons/": "/node_modules/three/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body style="margin: 0; background: #111; color: #ccc; font: 14px system-ui">
+    <p style="padding: 16px">Landscape generator. Driven by <code>scripts/landscape/render.mjs</code>.</p>
+    <script type="module">
+      import * as landscape from "./scene.js";
+      window.landscape = landscape;
+      window.__ready = true;
+    </script>
+  </body>
+</html>

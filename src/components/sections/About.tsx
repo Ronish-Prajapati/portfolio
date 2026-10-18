@@ -1,83 +1,71 @@
-import type { Profile, Skill } from "@prisma/client";
-import { getLucideIcon } from "@/lib/icons";
+import type { CSSProperties } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import type { GalleryImage, Profile } from "@prisma/client";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
+import ParallaxFrame from "@/components/summit/ParallaxFrame";
+import { SectionHeading } from "@/components/summit/SectionHeading";
+import Gallery from "@/components/sections/Gallery";
 
 interface AboutProps {
   profile: Profile | null;
-  skills: Skill[];
+  gallery: GalleryImage[];
 }
 
-const About = ({ profile, skills }: AboutProps) => {
-  const aboutLead =
-    profile?.about ??
+const delay = (s: number) => ({ "--reveal-delay": `${s}s` }) as CSSProperties;
+
+const About = ({ profile, gallery }: AboutProps) => {
+  const lead =
+    profile?.about?.trim() ||
     "I'm a passionate junior frontend developer with a strong foundation in React and TypeScript. I love turning designs into pixel-perfect, interactive experiences.";
-  const aboutParagraphs = profile?.aboutParagraphs ?? [];
-  const techStack = profile?.techStack ?? [];
+  const paragraphs = profile?.aboutParagraphs ?? [];
+  const photo = profile?.heroImage || "/images/hero-developer.png";
+  const github = profile?.githubUrl;
 
   return (
-    <section id="about" className="section-padding bg-background">
-      <div className="container-custom">
-        {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <p className="text-accent font-mono text-sm mb-3">What I Do</p>
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            What I build and how I work
-          </h2>
-          <p className="text-muted-foreground">
-            I focus on creating clean, maintainable code that delivers exceptional user
-            experiences. Here&apos;s what I bring to the table.
-          </p>
-        </div>
-
-        {/* Skills Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {skills.map((skill, index) => {
-            const Icon = getLucideIcon(skill.icon);
-            return (
-              <div
-                key={skill.id}
-                className="group p-6 bg-card rounded-xl border border-border hover:border-accent/50 hover:shadow-elevated transition-all duration-300"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-accent/20 transition-colors">
-                  <Icon className="w-6 h-6 text-accent" />
-                </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">{skill.name}</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  {skill.description}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* About Me Text */}
-        <div className="mt-20 grid md:grid-cols-2 gap-12 items-center">
-          <div>
-            <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-6">
-              A bit about me
-            </h3>
-            <div className="space-y-4 text-muted-foreground">
-              <p>{aboutLead}</p>
-              {aboutParagraphs.map((paragraph, i) => (
-                <p key={i}>{paragraph}</p>
-              ))}
-            </div>
+    <section id="about" aria-labelledby="about-title" className="relative py-28 md:py-40">
+      <div className="s-container grid items-start gap-x-16 gap-y-14 lg:grid-cols-12">
+        <figure className="lg:sticky lg:top-24 lg:col-span-5">
+          <div data-reveal="clip">
+            <ParallaxFrame amount={4} className="aspect-[4/5] rounded-[2px] border border-snow/10 bg-forest-900">
+              <Image
+                src={photo}
+                alt="Ronish Prajapati standing on a snowfield with a trekking pole, snow-covered peaks behind him"
+                fill
+                sizes="(max-width: 1024px) 100vw, 40vw"
+                className="object-cover object-[68%_45%]"
+              />
+            </ParallaxFrame>
           </div>
-          <div className="bg-secondary rounded-2xl p-8">
-            <h4 className="font-semibold text-foreground mb-4">Tech Stack</h4>
-            <div className="flex flex-wrap gap-2">
-              {techStack.map((tech) => (
-                <span
-                  key={tech}
-                  className="px-3 py-1.5 bg-background text-foreground text-sm rounded-full border border-border"
-                >
-                  {tech}
-                </span>
-              ))}
-            </div>
+        </figure>
+
+        <div className="lg:col-span-6 lg:col-start-7 lg:pt-6">
+          <SectionHeading id="about-title" title="Beyond the screen" />
+          <p data-reveal className="mt-10 text-balance text-[clamp(1.35rem,2.1vw,1.8rem)] font-medium leading-[1.3] text-snow">
+            {lead}
+          </p>
+          {paragraphs.map((paragraph, i) => (
+            <p key={i} data-reveal style={delay(0.06 * (i + 1))} className="s-prose mt-6">
+              {paragraph}
+            </p>
+          ))}
+          <div data-reveal style={delay(0.2)} className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4 text-[0.95rem]">
+            <Link href="/blog" className="s-link font-medium">
+              Read the blog
+              <ArrowRight className="h-4 w-4" data-nudge="right" aria-hidden />
+            </Link>
+            {github ? (
+              <a href={github} target="_blank" rel="noopener noreferrer" className="s-link text-fog">
+                GitHub
+                <ArrowUpRight className="h-4 w-4" data-nudge="right" aria-hidden />
+                <span className="sr-only">(opens in a new tab)</span>
+              </a>
+            ) : null}
           </div>
         </div>
       </div>
+
+      {gallery.length > 0 ? <Gallery images={gallery} /> : null}
     </section>
   );
 };

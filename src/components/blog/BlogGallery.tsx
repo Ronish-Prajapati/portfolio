@@ -37,7 +37,7 @@ export default function BlogGallery({ images, title }: BlogGalleryProps) {
 
   return (
     <section className="mt-14">
-      <h2 className="flex items-center gap-2 text-2xl font-bold text-foreground mb-6">
+      <h2 className="s-title mb-6 flex items-center gap-2 text-2xl">
         <Camera className="w-6 h-6 text-accent" />
         {title ?? "Photo Gallery"}
       </h2>
@@ -48,7 +48,7 @@ export default function BlogGallery({ images, title }: BlogGalleryProps) {
           <button
             key={`${src}-${i}`}
             onClick={() => setIndex(i)}
-            className="group block w-full overflow-hidden rounded-xl bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-accent break-inside-avoid"
+            className="group block w-full overflow-hidden rounded-[2px] border border-snow/10 bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-accent break-inside-avoid"
             aria-label={`Open image ${i + 1}`}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}

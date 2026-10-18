@@ -203,3 +203,554 @@
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground) / 0.5);
 }
+
+/* ==========================================================================
+   The Summit: public site design system.
+   Scoped so the admin panel keeps its original look. Palette sampled from the
+   rendered landscape (scripts/landscape).
+   ========================================================================== */
+
+@layer base {
+  :root {
+    --s-night: 3 17 26;
+    --s-forest-950: 6 14 12;
+    --s-forest-900: 10 22 19;
+    --s-forest-800: 16 32 27;
+    --s-forest-700: 25 48 41;
+    --s-moss-600: 44 68 56;
+    --s-sage-400: 147 168 156;
+    --s-fog-200: 197 206 200;
+    --s-snow-50: 238 242 238;
+    --s-ember-300: 239 187 140;
+    --s-ember-400: 227 160 102;
+    --s-ember-500: 201 130 74;
+    --s-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --s-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --s-gutter: clamp(1.25rem, 5vw, 4.5rem);
+  }
+
+  /* Public pages re-point the shared shadcn tokens to the forest palette.
+     :has() themes the whole document (body, portals, toasts); the plain
+     .summit selector covers browsers without :has(). */
+  :root:has(.summit),
+  .summit {
+    --background: 165 40% 3.9%;
+    --foreground: 120 13.3% 94.1%;
+    --card: 161 33.3% 9.4%;
+    --card-foreground: 120 13.3% 94.1%;
+    --popover: 165 37.5% 6.3%;
+    --popover-foreground: 120 13.3% 94.1%;
+    --primary: 28 69.1% 64.5%;
+    --primary-foreground: 165 40% 3.9%;
+    --secondary: 165 37.5% 6.3%;
+    --secondary-foreground: 140 8.4% 79%;
+    --muted: 165 37.5% 6.3%;
+    --muted-foreground: 146 10.8% 61.8%;
+    --accent: 28 69.1% 64.5%;
+    --accent-foreground: 165 40% 3.9%;
+    --destructive: 9 50.6% 50%;
+    --destructive-foreground: 120 13.3% 94.1%;
+    --border: 158 23.5% 13.3%;
+    --input: 150 21.4% 22%;
+    --ring: 28 69.1% 64.5%;
+    --radius: 0.125rem;
+  }
+
+  :root:has(.summit) {
+    color-scheme: dark;
+    scroll-padding-top: 5rem;
+    background: rgb(var(--s-forest-950));
+  }
+
+  :root:has(.summit) body,
+  .summit {
+    background: rgb(var(--s-forest-950));
+    color: rgb(var(--s-fog-200));
+    font-family: var(--font-body), system-ui, sans-serif;
+  }
+
+  .summit ::selection {
+    background: rgb(var(--s-ember-400) / 0.9);
+    color: rgb(var(--s-forest-950));
+  }
+
+  .summit :focus-visible {
+    outline: 2px solid rgb(var(--s-ember-400));
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+@layer components {
+  /* Condensed display type: expedition-poster headlines. */
+  .s-display {
+    font-family: var(--font-display), system-ui, sans-serif;
+    font-stretch: 70%;
+    font-variation-settings: "wdth" 70;
+    font-weight: 650;
+    text-transform: uppercase;
+    letter-spacing: -0.005em;
+    line-height: 0.9;
+    color: rgb(var(--s-snow-50));
+    text-wrap: balance;
+  }
+
+  .s-title {
+    font-family: var(--font-display), system-ui, sans-serif;
+    font-stretch: 84%;
+    font-variation-settings: "wdth" 84;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.05;
+    color: rgb(var(--s-snow-50));
+    text-wrap: balance;
+  }
+
+  /* Small mono metadata: dates, years, technologies. */
+  .s-label {
+    font-family: var(--font-label), ui-monospace, monospace;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgb(var(--s-sage-400));
+  }
+
+  .s-prose {
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    color: rgb(var(--s-fog-200));
+    max-width: 62ch;
+  }
+
+  .s-container {
+    width: 100%;
+    max-width: 88rem;
+    margin-inline: auto;
+    padding-inline: var(--s-gutter);
+  }
+
+  /* Buttons: one shape (2px corners), one accent. */
+  .s-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    height: 3rem;
+    padding-inline: 1.35rem;
+    border-radius: 2px;
+    font-family: var(--font-body), system-ui, sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition:
+      background-color 0.25s var(--s-ease-out),
+      color 0.25s var(--s-ease-out),
+      border-color 0.25s var(--s-ease-out),
+      transform 0.25s var(--s-ease-out);
+  }
+  .s-btn:active {
+    transform: translateY(1px) scale(0.985);
+  }
+  .s-btn svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    transition: transform 0.3s var(--s-ease-out);
+  }
+  .s-btn:hover svg[data-nudge="right"] {
+    transform: translateX(3px);
+  }
+  .s-btn:hover svg[data-nudge="down"] {
+    transform: translateY(2px);
+  }
+  .s-btn-primary {
+    background: rgb(var(--s-ember-400));
+    color: rgb(var(--s-forest-950));
+  }
+  .s-btn-primary:hover {
+    background: rgb(var(--s-ember-300));
+  }
+  .s-btn-ghost {
+    border: 1px solid rgb(var(--s-snow-50) / 0.28);
+    color: rgb(var(--s-snow-50));
+    background: rgb(var(--s-forest-950) / 0.25);
+  }
+  .s-btn-ghost:hover {
+    border-color: rgb(var(--s-snow-50) / 0.6);
+    background: rgb(var(--s-snow-50) / 0.06);
+  }
+
+  /* Text link with an underline that draws in from the left. */
+  .s-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: rgb(var(--s-snow-50));
+    text-decoration: none;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    padding-bottom: 2px;
+    transition:
+      background-size 0.35s var(--s-ease-out),
+      color 0.2s;
+  }
+  .s-link:hover {
+    background-size: 100% 1px;
+  }
+  .s-link svg {
+    transition: transform 0.3s var(--s-ease-out);
+  }
+  .s-link:hover svg[data-nudge="right"] {
+    transform: translate(2px, -2px);
+  }
+
+  /* Technology chips: square, hairline, quiet. */
+  .s-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.75rem;
+    padding-inline: 0.6rem;
+    border: 1px solid rgb(var(--s-moss-600) / 0.9);
+    border-radius: 2px;
+    font-family: var(--font-label), ui-monospace, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    color: rgb(var(--s-fog-200));
+    white-space: nowrap;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Hero: layered landscape. The intro runs in CSS so it starts at first paint,
+   before hydration. Parallax (Motion) lives on the outer layer wrappers.
+   -------------------------------------------------------------------------- */
+
+.hero {
+  container-type: size;
+  /* Stage focus point (fraction of the overflow cropped on the left / top). */
+  --px: 0.6;
+  --py: 0.42;
+  /* Summit position inside the rendered stage (hero-scene.json). */
+  --summit-y: 0.2578;
+}
+
+/* The stage keeps the landscape's 16:9 aspect while covering the hero, so
+   every layer and the route overlay share one coordinate system. */
+.hero-stage {
+  position: absolute;
+  inset: 0;
+}
+@supports (width: 1cqw) {
+  .hero-stage {
+    inset: auto;
+    width: max(100cqw, 177.78cqh);
+    aspect-ratio: 16 / 9;
+    left: calc((100cqw - max(100cqw, 177.78cqh)) * var(--px));
+    top: calc((100cqh - max(100cqw, 177.78cqh) * 0.5625) * var(--py));
+  }
+}
+
+/* Name: phones stack it above the peak; wider screens set it so the summit
+   always rises about a fifth of the way into the letters, whatever the
+   viewport's aspect ratio. */
+.hero-name {
+  top: clamp(5.5rem, 15.5svh, 11rem);
+  font-size: clamp(3.6rem, 21.5vw, 7rem);
+}
+@media (min-width: 768px) {
+  .hero-name {
+    --name-size: min(10.4vw, 10.5rem);
+    font-size: var(--name-size);
+    top: 7rem;
+  }
+  @supports (width: 1cqw) {
+    .hero-name {
+      top: max(
+        4.75rem,
+        calc(
+          (100cqh - max(100cqw, 177.78cqh) * 0.5625) * var(--py) + max(100cqw, 177.78cqh) * 0.5625 *
+            var(--summit-y) - 0.66 * var(--name-size)
+        )
+      );
+    }
+  }
+}
+
+/* Phones: a slightly smaller stage anchored to the bottom keeps the peak clear
+   of the stacked name; the sky's top edge fades into the night above. */
+@media (max-width: 767px) {
+  .hero {
+    --px: 0.585;
+  }
+  @supports (width: 1cqw) {
+    .hero-stage {
+      width: max(100cqw, 151cqh);
+      top: auto;
+      bottom: 0;
+      left: calc((100cqw - max(100cqw, 151cqh)) * var(--px));
+    }
+  }
+  .hero-sky {
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 16%);
+    mask-image: linear-gradient(to bottom, transparent, #000 16%);
+  }
+}
+
+.hero-layer {
+  position: absolute;
+  inset: 0;
+}
+.hero-layer > .hero-intro {
+  position: absolute;
+  inset: 0;
+}
+
+@keyframes hero-dolly {
+  from {
+    transform: translate3d(0, var(--dolly-y, 0), 0) scale(var(--dolly-s, 1));
+  }
+}
+@keyframes hero-veil {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+@keyframes hero-rise {
+  from {
+    transform: translate3d(0, 108%, 0);
+  }
+}
+@keyframes hero-fade-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+}
+@keyframes hero-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes hero-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+@keyframes mist-drift {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.hero-intro {
+  animation: hero-dolly 2.6s var(--s-ease-out) backwards;
+  animation-delay: var(--dolly-delay, 0s);
+  transform-origin: 50% 100%;
+}
+.hero-veil {
+  animation: hero-veil 1.9s var(--s-ease-in-out) 0.1s forwards;
+}
+.hero-name-line > span {
+  display: block;
+  animation: hero-rise 1.25s var(--s-ease-out) backwards;
+  animation-delay: var(--rise-delay, 0.75s);
+}
+.hero-fade {
+  animation: hero-fade-up 0.9s var(--s-ease-out) backwards;
+  animation-delay: var(--fade-delay, 1.2s);
+}
+.hero-route-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  animation: hero-draw 2.2s var(--s-ease-in-out) 1.5s backwards;
+}
+.hero-waypoint {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hero-pop 0.6s var(--s-ease-out) backwards;
+  animation-delay: var(--pop-delay, 2s);
+}
+.hero-tag {
+  animation: hero-fade-up 0.7s var(--s-ease-out) backwards;
+  animation-delay: var(--pop-delay, 2s);
+}
+
+/* Hold the intro (veil up, name below the horizon) until the layers have
+   loaded. Only when JS runs (html[data-js]); the layout's pre-paint timer sets
+   data-hero-ready as a last resort so content can never stay hidden. */
+html[data-js]:not([data-hero-ready]) .hero[data-ready="false"] .hero-intro,
+html[data-js]:not([data-hero-ready]) .hero[data-ready="false"] .hero-veil,
+html[data-js]:not([data-hero-ready]) .hero[data-ready="false"] .hero-name-line > span,
+html[data-js]:not([data-hero-ready]) .hero[data-ready="false"] .hero-fade,
+html[data-js]:not([data-hero-ready]) .hero[data-ready="false"] .hero-route-draw,
+html[data-js]:not([data-hero-ready]) .hero[data-ready="false"] .hero-waypoint,
+html[data-js]:not([data-hero-ready]) .hero[data-ready="false"] .hero-tag {
+  animation-play-state: paused;
+}
+
+.mist-track {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 200%;
+  background-repeat: repeat-x;
+  background-size: 50% 100%;
+  animation: mist-drift var(--mist-speed, 120s) linear infinite;
+}
+.hero[data-offscreen="true"] .mist-track {
+  animation-play-state: paused;
+}
+
+/* Returning in the same session (or after the intro has played once on a
+   client-side navigation): show the settled scene immediately. */
+html[data-intro="seen"] .hero-intro,
+html[data-intro="seen"] .hero-name-line > span,
+html[data-intro="seen"] .hero-fade,
+html[data-intro="seen"] .hero-route-draw,
+html[data-intro="seen"] .hero-waypoint,
+html[data-intro="seen"] .hero-tag {
+  animation: none;
+}
+html[data-intro="seen"] .hero-veil {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-intro,
+  .hero-name-line > span,
+  .hero-fade,
+  .hero-route-draw,
+  .hero-waypoint,
+  .hero-tag,
+  .mist-track {
+    animation: none !important;
+  }
+  .hero-veil {
+    display: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Scroll reveals (see RevealObserver). Nothing is hidden until the observer
+   has armed, so server HTML and no-JS visitors always see the content.
+   -------------------------------------------------------------------------- */
+
+[data-reveal]:not([data-reveal="mask"]):not([data-reveal="clip"]):not([data-reveal="draw"]) {
+  transition:
+    opacity 0.9s var(--s-ease-out),
+    transform 0.9s var(--s-ease-out);
+  transition-delay: var(--reveal-delay, 0s);
+}
+html[data-reveal-ready] [data-reveal]:not([data-reveal="mask"]):not([data-reveal="clip"]):not([data-reveal="draw"]):not([data-revealed]) {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+}
+[data-reveal="mask"] > * {
+  transition: transform 1.1s var(--s-ease-out);
+  transition-delay: var(--reveal-delay, 0s);
+}
+html[data-reveal-ready] [data-reveal="mask"]:not([data-revealed]) > * {
+  transform: translate3d(0, 105%, 0);
+}
+/* The clip goes on the child: IntersectionObserver counts the observed
+   element's own clip-path, so a fully clipped target would never intersect. */
+[data-reveal="clip"] > * {
+  transition: clip-path 1.3s var(--s-ease-out);
+  transition-delay: var(--reveal-delay, 0s);
+}
+html[data-reveal-ready] [data-reveal="clip"]:not([data-revealed]) > * {
+  clip-path: inset(100% 0 0 0);
+}
+
+/* Route drawn in when it enters view (summit vista). */
+[data-reveal="draw"] .draw-path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 2.6s var(--s-ease-in-out) 0.3s;
+}
+html[data-reveal-ready] [data-reveal="draw"]:not([data-revealed]) .draw-path {
+  stroke-dashoffset: 1;
+}
+
+@keyframes beacon {
+  from {
+    transform: scale(0.4);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+.vista-beacon {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0.45;
+}
+[data-reveal="draw"][data-revealed] .vista-beacon {
+  animation: beacon 2.4s var(--s-ease-out) 2.6s 3 both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal],
+  [data-reveal] > *,
+  [data-reveal] .draw-path {
+    transition: none !important;
+  }
+  .vista-beacon {
+    animation: none !important;
+  }
+  html[data-reveal-ready] [data-reveal="draw"]:not([data-revealed]) .draw-path {
+    stroke-dashoffset: 0 !important;
+  }
+  html[data-reveal-ready] [data-reveal]:not([data-revealed]),
+  html[data-reveal-ready] [data-reveal]:not([data-revealed]) > * {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
+}
+
+/* Summit vista: same cover-stage technique as the hero. */
+.vista {
+  container-type: size;
+  --px: 0.58;
+  --py: 0.5;
+}
+.vista-stage {
+  position: absolute;
+  inset: 0;
+}
+@supports (width: 1cqw) {
+  .vista-stage {
+    inset: auto;
+    width: max(100cqw, 177.78cqh);
+    aspect-ratio: 16 / 9;
+    left: calc((100cqw - max(100cqw, 177.78cqh)) * var(--px));
+    top: calc((100cqh - max(100cqw, 177.78cqh) * 0.5625) * var(--py));
+  }
+}
+
+/* Film grain: fixed and non-interactive, never on a scrolling container. */
+.s-grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}

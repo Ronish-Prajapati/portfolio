@@ -20,6 +20,8 @@ export const siteConfig = {
   ogImage: "/opengraph-image",
   // Google Search Console verification token (optional).
   googleVerification: process.env.GOOGLE_SITE_VERIFICATION,
+  // Shown on the homepage; matches "from Nepal" in the description above.
+  location: "Nepal",
   links: {
     github: "https://github.com/Ronish-Prajapati",
     linkedin: "https://www.linkedin.com/in/ronish-prajapati-116abb26a/",

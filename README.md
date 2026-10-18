@@ -1,8 +1,9 @@
 # Ronish Prajapati — Portfolio (Next.js + Prisma)
 
-A fully dynamic developer portfolio with a database-backed admin CMS. Migrated from the
-original Vite + React single-page app to **Next.js (App Router)** with the **same UI/design**,
-plus a complete backend for managing every section without touching code.
+A fully dynamic developer portfolio with a database-backed admin CMS, designed as
+**"The Summit: A Developer's Journey"**: a layered mountain landscape at first light, a route
+that climbs through projects and experience, and the same mountain after sunrise at the
+contact section. Every section is still managed from the admin panel without touching code.
 
 ## Tech Stack
 
@@ -10,7 +11,9 @@ plus a complete backend for managing every section without touching code.
 | -------------- | ------------------------------------------------- |
 | Framework      | Next.js 15 (App Router, React Server Components)  |
 | Language       | TypeScript                                        |
-| Styling        | Tailwind CSS + shadcn/ui (unchanged design tokens)|
+| Styling        | Tailwind CSS (public "Summit" tokens) + shadcn/ui (admin) |
+| Motion         | Motion (`motion/react`) for parallax and scroll-linked effects; CSS for the intro and reveals |
+| Landscape      | Original three.js scene, rendered offline into image layers (no runtime WebGL) |
 | Database       | PostgreSQL — **Neon** (free tier)                 |
 | ORM            | Prisma                                            |
 | Auth           | NextAuth v5 (Auth.js) — Credentials + bcrypt      |
@@ -20,9 +23,11 @@ plus a complete backend for managing every section without touching code.
 
 ## Features
 
-- **Public site** (server-rendered, statically generated + ISR): Hero, About, Experience,
-  Projects, Education, Testimonials, Contact, plus `/projects/[slug]`, `/experience/[id]`,
-  `/blog` and `/blog/[slug]`.
+- **Public site** (server-rendered, statically generated + ISR): a layered landscape hero,
+  Trailhead (introduction), Expeditions (projects), The climb (experience + education),
+  Beyond the screen (about + gallery), Technical terrain (stack), Testimonials and the Summit
+  (contact), plus `/projects/[slug]`, `/experience/[id]`, `/blog` and `/blog/[slug]`.
+  Section anchors (`#projects`, `#experience`, `#education`, `#about`, `#contact`, ...) are stable.
 - **Admin panel** at `/admin`: secure login, dashboard, full CRUD for Projects, Skills,
   Experience, Education, Blogs, Testimonials, an About/Profile editor, image uploads to
   Cloudinary, and a contact-message inbox.
@@ -33,11 +38,41 @@ plus a complete backend for managing every section without touching code.
 
 ---
 
+## Design system and landscape
+
+- **Tokens** live in `src/app/globals.css` ("The Summit" block) and `tailwind.config.ts`
+  (`forest`, `sage`, `fog`, `snow`, `ember`, `font-display` / `font-body` / `font-label`).
+  They are scoped to public pages (`main.summit`), so the admin panel keeps its own look.
+- **Hero**: `src/components/landscape/HeroLandscape.tsx` composites five transparent depth
+  layers (`public/landscape/hero-*.webp`) with pointer and scroll parallax. The intro (cloud
+  veil, name rising behind the summit, route drawing) runs in CSS, waits for the layers to
+  load, plays once per session and is skipped entirely under `prefers-reduced-motion`.
+- **Generator**: `scripts/landscape/` builds the mountain scene in three.js (procedural
+  terrain, pines, fog, dawn and sunrise lighting) and renders it offline with headless
+  Chrome/Edge. Re-render after changing the scene:
+  ```bash
+  npm run landscape:render                      # hero layers, summit view, route + topo data
+  npm run landscape:render -- --preview <dir>   # quick composite preview
+  npm run landscape:render -- --summit          # only the sunrise "summit" view
+  ```
+  It writes `public/landscape/*` and `src/components/landscape/*.json` (route coordinates for
+  the overlays). Requires a local Chrome or Edge install.
+- **Content fallback**: if the database cannot be reached (local development without
+  credentials, or an outage) public pages render `src/lib/content-snapshot.ts`, a snapshot of
+  the published content, instead of empty sections. A reachable database always wins.
+
+---
+
 ## Database Schema (Prisma models)
 
 `Profile` (singleton — Hero/About/Footer), `Project`, `Skill`, `Experience`, `Education`,
 `Blog`, `Testimonial`, `ContactMessage`, `AdminUser`. See [`prisma/schema.prisma`](prisma/schema.prisma)
 for the full definition. Images are stored as **Cloudinary URL strings** — never as binary.
+
+`Project.role` (optional) is a one-line summary of your contribution, shown on the homepage
+and the case study page. Its migration (`20261017120000_add_project_role`) only adds a nullable
+column and is applied automatically by `prisma migrate deploy` on the next Vercel build. Fill it
+in from **Admin → Projects → My Role**.
 
 ---
 
@@ -131,6 +166,7 @@ npm run dev
 | `npm run db:deploy`   | Apply migrations (production)                |
 | `npm run db:seed`     | Seed database with portfolio content + admin |
 | `npm run db:studio`   | Open Prisma Studio                           |
+| `npm run landscape:render` | Re-render the landscape layers and data |
 
 ---
 
@@ -142,9 +178,13 @@ src/
   app/                 App Router pages, API routes, admin, sitemap/robots/og
   actions/             server actions (auth, resource CRUD, profile, messages)
   components/
-    sections/          public site sections (Hero, About, …, Contact, Footer)
+    sections/          public site sections (Hero, Trailhead, Projects, …, Contact, Footer)
+    landscape/         hero and summit landscape components + generated route data
+    summit/            design-system pieces (reveals, parallax frame, climb route, form, rail)
     admin/             admin shell, forms, table, image upload
     ui/                shadcn/ui primitives
   lib/                 prisma, auth, cloudinary, queries, validations, resources
 public/images/         seeded section images
+public/landscape/      rendered landscape layers, summit view, topo map, mist
+scripts/landscape/     three.js landscape generator (offline)
 ```

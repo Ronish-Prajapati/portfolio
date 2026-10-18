@@ -44,3 +44,6 @@ next-env.d.ts
 *.njsproj
 *.sln
 *.sw?
+
+# landscape generator previews
+.landscape-preview/

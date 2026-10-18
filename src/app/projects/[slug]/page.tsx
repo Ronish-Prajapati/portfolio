@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ExternalLink, Github, Calendar, CheckCircle2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ArrowLeft, ArrowRight, ArrowUpRight, Github } from "lucide-react";
 import Header from "@/components/sections/Header";
 import Footer from "@/components/sections/Footer";
+import RevealObserver from "@/components/summit/RevealObserver";
 import { getProjectBySlug, getProjects, getProfile } from "@/lib/queries";
 import { siteConfig } from "@/lib/site";
 
@@ -46,6 +46,12 @@ export async function generateMetadata({
   };
 }
 
+const paragraphs = (text: string) =>
+  text
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+
 export default async function ProjectDetailPage({
   params,
 }: {
@@ -60,181 +66,167 @@ export default async function ProjectDetailPage({
 
   if (!project) notFound();
 
-  const otherProjects = allProjects.filter((p) => p.id !== project.id).slice(0, 2);
+  const index = allProjects.findIndex((p) => p.id === project.id);
+  const next = allProjects.length > 1 ? allProjects[(index + 1) % allProjects.length] : null;
 
   return (
-    <main className="min-h-screen bg-background">
-      <Header email={profile?.email} />
+    <main className="summit s-grain min-h-screen">
+      <Header email={profile?.email} resumeUrl={profile?.resumeUrl} />
 
-      {/* Hero Section */}
-      <section className="pt-32 pb-16 bg-secondary">
-        <div className="container-custom">
-          <Link
-            href="/#projects"
-            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8"
-          >
-            <ArrowLeft size={16} />
-            Back to Projects
+      <article>
+        <header className="s-container pb-14 pt-32 md:pt-40">
+          <Link href="/#projects" className="s-link text-sm text-sage hover:text-snow">
+            <ArrowLeft className="h-4 w-4" aria-hidden />
+            All expeditions
           </Link>
-
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <span className="inline-flex items-center gap-2 text-sm text-accent font-mono mb-4">
-                <Calendar size={14} />
-                {project.year}
-              </span>
-              <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-                {project.title}
-              </h1>
-              <p className="text-muted-foreground text-lg mb-6">{project.description}</p>
-
-              <div className="flex flex-wrap gap-2 mb-8">
-                {project.technologies.map((tech) => (
-                  <span
-                    key={tech}
-                    className="px-3 py-1.5 bg-background text-foreground text-sm rounded-full border border-border"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
-
-              <div className="flex gap-4">
-                {project.liveLink && (
-                  <Button size="lg" asChild>
-                    <a href={project.liveLink} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink size={18} />
-                      Live Demo
-                    </a>
-                  </Button>
-                )}
-                {project.githubLink && (
-                  <Button variant="outline" size="lg" asChild>
-                    <a href={project.githubLink} target="_blank" rel="noopener noreferrer">
-                      <Github size={18} />
-                      Source Code
-                    </a>
-                  </Button>
-                )}
-              </div>
+          <div className="mt-10 grid gap-10 lg:grid-cols-12 lg:items-end">
+            <div className="lg:col-span-8">
+              {project.year ? <p className="s-label">{project.year}</p> : null}
+              <h1 className="s-title mt-4 text-[clamp(2.4rem,5.2vw,4.75rem)]">{project.title}</h1>
+              <p className="mt-6 max-w-[58ch] text-lg leading-relaxed text-fog">{project.description}</p>
             </div>
+            <div className="flex flex-wrap gap-3 lg:col-span-4 lg:justify-end">
+              {project.liveLink ? (
+                <a href={project.liveLink} target="_blank" rel="noopener noreferrer" className="s-btn s-btn-primary">
+                  Visit live site
+                  <ArrowUpRight data-nudge="right" aria-hidden />
+                  <span className="sr-only">(opens in a new tab)</span>
+                </a>
+              ) : null}
+              {project.githubLink ? (
+                <a href={project.githubLink} target="_blank" rel="noopener noreferrer" className="s-btn s-btn-ghost">
+                  <Github aria-hidden />
+                  Source code
+                  <span className="sr-only">(opens in a new tab)</span>
+                </a>
+              ) : null}
+            </div>
+          </div>
+        </header>
 
-            {project.image && (
-              <div className="relative">
+        {project.image ? (
+          <div className="s-container">
+            <div data-reveal="clip">
+              <div className="relative aspect-[16/10] overflow-hidden rounded-[2px] border border-snow/10 bg-forest-900 md:aspect-[2/1]">
                 <Image
                   src={project.image}
-                  alt={project.title}
-                  width={800}
-                  height={450}
-                  className="w-full rounded-2xl shadow-floating"
+                  alt={`Screenshot of ${project.title}`}
+                  fill
+                  priority
+                  sizes="(max-width: 1440px) 100vw, 1408px"
+                  className="object-cover object-top"
                 />
               </div>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Project Details */}
-      <section className="section-padding">
-        <div className="container-custom">
-          <div className="grid lg:grid-cols-3 gap-12">
-            {/* Main Content */}
-            <div className="lg:col-span-2">
-              <h2 className="text-2xl font-bold text-foreground mb-6">About This Project</h2>
-              <p className="text-muted-foreground leading-relaxed mb-8">
-                {project.longDescription}
-              </p>
-
-              {project.features.length > 0 && (
-                <>
-                  <h3 className="text-xl font-semibold text-foreground mb-4">Key Features</h3>
-                  <ul className="space-y-3">
-                    {project.features.map((feature, index) => (
-                      <li key={index} className="flex items-start gap-3">
-                        <CheckCircle2 className="w-5 h-5 text-accent mt-0.5 flex-shrink-0" />
-                        <span className="text-muted-foreground">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
-            </div>
-
-            {/* Sidebar */}
-            <div>
-              <div className="bg-secondary rounded-xl p-6 sticky top-24">
-                <h3 className="font-semibold text-foreground mb-4">Tech Stack</h3>
-                <div className="space-y-3">
-                  {project.technologies.map((tech) => (
-                    <div key={tech} className="flex items-center gap-3 text-muted-foreground">
-                      <div className="w-2 h-2 rounded-full bg-accent" />
-                      {tech}
-                    </div>
-                  ))}
-                </div>
-
-                {(project.liveLink || project.githubLink) && (
-                  <div className="border-t border-border mt-6 pt-6">
-                    <h3 className="font-semibold text-foreground mb-4">Links</h3>
-                    <div className="space-y-3">
-                      {project.liveLink && (
-                        <a
-                          href={project.liveLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 text-accent hover:underline"
-                        >
-                          <ExternalLink size={16} />
-                          View Live Site
-                        </a>
-                      )}
-                      {project.githubLink && (
-                        <a
-                          href={project.githubLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 text-accent hover:underline"
-                        >
-                          <Github size={16} />
-                          GitHub Repository
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
             </div>
           </div>
-        </div>
-      </section>
+        ) : null}
 
-      {/* Other Projects */}
-      {otherProjects.length > 0 && (
-        <section className="section-padding bg-secondary">
-          <div className="container-custom">
-            <h2 className="text-2xl font-bold text-foreground mb-8">Other Projects</h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              {otherProjects.map((otherProject) => (
-                <Link
-                  key={otherProject.id}
-                  href={`/projects/${otherProject.slug}`}
-                  className="group bg-card rounded-xl border border-border p-6 hover:shadow-soft transition-all"
-                >
-                  <span className="text-xs text-muted-foreground font-mono">
-                    {otherProject.year}
-                  </span>
-                  <h3 className="text-xl font-semibold text-foreground mt-1 mb-2 group-hover:text-accent transition-colors">
-                    {otherProject.title}
-                  </h3>
-                  <p className="text-muted-foreground text-sm">{otherProject.description}</p>
-                </Link>
+        <div className="s-container grid gap-16 py-20 md:py-28 lg:grid-cols-12">
+          <div className="lg:col-span-7">
+            <h2 className="s-title text-[clamp(1.75rem,2.6vw,2.25rem)]">About this project</h2>
+            <div className="mt-6 space-y-5">
+              {paragraphs(project.longDescription).map((p, i) => (
+                <p key={i} className="s-prose">
+                  {p}
+                </p>
               ))}
             </div>
+
+            {project.features.length > 0 ? (
+              <>
+                <h2 className="s-title mt-16 text-[clamp(1.75rem,2.6vw,2.25rem)]">Key features</h2>
+                <ul className="mt-6 grid gap-x-10 sm:grid-cols-2">
+                  {project.features.map((feature, i) => (
+                    <li key={i} className="flex gap-4 border-t border-snow/10 py-4 text-fog">
+                      <span aria-hidden className="mt-[0.7em] h-px w-3 shrink-0 bg-ember" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : null}
           </div>
+
+          <aside className="lg:col-span-4 lg:col-start-9">
+            <dl className="grid gap-0 lg:sticky lg:top-28">
+              {project.year ? (
+                <div className="border-t border-snow/10 py-5">
+                  <dt className="s-label">Year</dt>
+                  <dd className="mt-2 text-snow">{project.year}</dd>
+                </div>
+              ) : null}
+              {project.role ? (
+                <div className="border-t border-snow/10 py-5">
+                  <dt className="s-label">My role</dt>
+                  <dd className="mt-2 leading-relaxed text-snow">{project.role}</dd>
+                </div>
+              ) : null}
+              {project.technologies.length > 0 ? (
+                <div className="border-t border-snow/10 py-5">
+                  <dt className="s-label">Stack</dt>
+                  <dd className="mt-3 flex flex-wrap gap-2">
+                    {project.technologies.map((tech) => (
+                      <span key={tech} className="s-chip">
+                        {tech}
+                      </span>
+                    ))}
+                  </dd>
+                </div>
+              ) : null}
+              {project.liveLink || project.githubLink ? (
+                <div className="border-t border-snow/10 py-5">
+                  <dt className="s-label">Links</dt>
+                  <dd className="mt-3 grid gap-2">
+                    {project.liveLink ? (
+                      <a href={project.liveLink} target="_blank" rel="noopener noreferrer" className="s-link w-fit break-all">
+                        {project.liveLink.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+                        <ArrowUpRight className="h-4 w-4 shrink-0" data-nudge="right" aria-hidden />
+                      </a>
+                    ) : null}
+                    {project.githubLink ? (
+                      <a href={project.githubLink} target="_blank" rel="noopener noreferrer" className="s-link w-fit">
+                        GitHub repository
+                        <ArrowUpRight className="h-4 w-4" data-nudge="right" aria-hidden />
+                      </a>
+                    ) : null}
+                  </dd>
+                </div>
+              ) : null}
+            </dl>
+          </aside>
+        </div>
+      </article>
+
+      {next ? (
+        <section aria-labelledby="next-title" className="s-container">
+          <Link href={`/projects/${next.slug}`} className="group grid items-center gap-8 border-t border-snow/10 pt-12 md:grid-cols-12">
+            <div className="md:col-span-5">
+              <p className="s-label">Next expedition</p>
+              <h2 id="next-title" className="s-title mt-4 text-[clamp(1.75rem,3vw,2.75rem)] transition-colors group-hover:text-ember">
+                {next.title}
+              </h2>
+              <span className="s-link mt-6 text-[0.95rem]">
+                Read the case study
+                <ArrowRight className="h-4 w-4" data-nudge="right" aria-hidden />
+              </span>
+            </div>
+            {next.image ? (
+              <div className="relative aspect-[2/1] overflow-hidden rounded-[2px] border border-snow/10 md:col-span-7">
+                <Image
+                  src={next.image}
+                  alt=""
+                  fill
+                  sizes="(max-width: 768px) 100vw, 800px"
+                  className="object-cover object-top transition-transform duration-700 group-hover:scale-[1.025]"
+                />
+              </div>
+            ) : null}
+          </Link>
         </section>
-      )}
+      ) : null}
 
       <Footer profile={profile} />
+      <RevealObserver />
     </main>
   );
 }

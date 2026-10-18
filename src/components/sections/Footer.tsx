@@ -1,76 +1,78 @@
-import { Github, Linkedin, Mail } from "lucide-react";
+import Link from "next/link";
 import type { Profile } from "@prisma/client";
+import { ArrowRight, ArrowUp } from "lucide-react";
+import { CTA } from "@/lib/sections";
+import { siteConfig } from "@/lib/site";
 
 interface FooterProps {
   profile: Profile | null;
 }
 
-const Footer = ({ profile }: FooterProps) => {
-  const currentYear = new Date().getFullYear();
-  const name = profile?.name ?? "Ronish Prajapati";
-  const email = profile?.email ?? "ronishprajapati0@gmail.com";
-
-  const socialLinks = [
-    {
-      icon: Github,
-      href: profile?.githubUrl ?? "https://github.com/Ronish-Prajapati",
-      label: "GitHub",
-    },
-    {
-      icon: Linkedin,
-      href: profile?.linkedinUrl ?? "https://www.linkedin.com/in/ronish-prajapati-116abb26a/",
-      label: "LinkedIn",
-    },
-    { icon: Mail, href: `mailto:${email}`, label: "Email" },
-  ].filter((link) => Boolean(link.href));
+/** Bottom bar shared by the homepage summit and the inner pages. */
+export function FooterBar({ profile, topHref = "#top", topLabel = "Back to trailhead" }: FooterProps & { topHref?: string; topLabel?: string }) {
+  const name = profile?.name ?? siteConfig.name;
+  const links = [
+    { href: "/blog", label: "Blog", external: false },
+    { href: profile?.githubUrl ?? siteConfig.links.github, label: "GitHub", external: true },
+    { href: profile?.linkedinUrl ?? siteConfig.links.linkedin, label: "LinkedIn", external: true },
+  ];
 
   return (
-    <footer className="bg-hero py-16">
-      <div className="container-custom">
-        {/* CTA Section */}
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-hero-foreground mb-4">
-            Let&apos;s build something together
-          </h2>
-          <p className="text-hero-muted max-w-xl mx-auto mb-8">
-            I&apos;m currently looking for new opportunities. Whether you have a project in mind
-            or just want to chat, feel free to reach out!
-          </p>
-          <a
-            href={`mailto:${email}`}
-            className="inline-flex items-center gap-2 px-8 py-3 bg-hero-foreground text-hero rounded-lg font-medium hover:opacity-90 transition-opacity"
-          >
-            <Mail size={18} />
-            Get in Touch
-          </a>
-        </div>
-
-        {/* Divider */}
-        <div className="border-t border-hero-foreground/10 my-8" />
-
-        {/* Bottom Section */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-hero-muted text-sm">
-            © {currentYear} {name}. All rights reserved.
-          </p>
-
-          {/* Social Links */}
-          <div className="flex items-center gap-4">
-            {socialLinks.map((social) => (
-              <a
-                key={social.label}
-                href={social.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-hero-muted hover:text-hero-foreground transition-colors"
-                aria-label={social.label}
-              >
-                <social.icon size={20} />
-              </a>
+    <div className="border-t border-snow/10">
+      <div className="s-container flex flex-col gap-5 py-8 text-sm text-sage md:flex-row md:items-center md:justify-between">
+        <p>
+          &copy; {new Date().getFullYear()} {name}. All rights reserved.
+        </p>
+        <nav aria-label="Footer">
+          <ul className="flex flex-wrap items-center gap-x-7 gap-y-3">
+            {links.map((link) => (
+              <li key={link.label}>
+                {link.external ? (
+                  <a href={link.href} target="_blank" rel="noopener noreferrer" className="s-link text-sage hover:text-snow">
+                    {link.label}
+                    <span className="sr-only"> (opens in a new tab)</span>
+                  </a>
+                ) : (
+                  <Link href={link.href} className="s-link text-sage hover:text-snow">
+                    {link.label}
+                  </Link>
+                )}
+              </li>
             ))}
-          </div>
-        </div>
+            <li>
+              <a href={topHref} className="s-link text-fog hover:text-snow">
+                {topLabel}
+                <ArrowUp className="h-3.5 w-3.5" aria-hidden />
+              </a>
+            </li>
+          </ul>
+        </nav>
       </div>
+    </div>
+  );
+}
+
+/** Inner-page footer: a short invitation back to the summit, then the bar. */
+const Footer = ({ profile }: FooterProps) => {
+  return (
+    <footer className="relative mt-24 overflow-hidden">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[url(/landscape/topo.svg)] bg-[length:120%_auto] bg-[position:50%_30%] bg-no-repeat opacity-[0.07]"
+      />
+      <div className="s-container relative flex flex-col items-start gap-8 py-20 md:flex-row md:items-end md:justify-between">
+        <div>
+          <p className="s-display text-[clamp(2.5rem,6vw,5rem)]">Let&rsquo;s build something together</p>
+          <p className="mt-4 max-w-[52ch] text-sage">
+            I&apos;m currently looking for new opportunities. Whether you have a project in mind or just want to chat, feel free to reach out!
+          </p>
+        </div>
+        <Link href="/#contact" className="s-btn s-btn-primary shrink-0">
+          {CTA.contact}
+          <ArrowRight data-nudge="right" aria-hidden />
+        </Link>
+      </div>
+      <FooterBar profile={profile} topHref="#" topLabel="Back to top" />
     </footer>
   );
 };

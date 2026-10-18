@@ -2,92 +2,71 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import type { GalleryImage } from "@prisma/client";
 
 interface GalleryProps {
   images: GalleryImage[];
 }
 
+/** Photo strip from the CMS gallery, with a lightbox. Renders nothing when empty. */
 const Gallery = ({ images }: GalleryProps) => {
   const [active, setActive] = useState<GalleryImage | null>(null);
 
   if (images.length === 0) return null;
 
   return (
-    <section id="gallery" className="section-padding bg-secondary">
-      <div className="container-custom">
-        {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <p className="text-accent font-mono text-sm mb-3">Captured Moments</p>
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Gallery</h2>
-          <p className="text-muted-foreground">
-            A visual collection of moments, work and inspiration.
-          </p>
-        </div>
-
-        {/* Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {images.map((img, index) => (
+    <div id="gallery" className="mt-28 scroll-mt-24 md:mt-36">
+      <div className="s-container flex items-end justify-between gap-6">
+        <h3 className="s-title text-[clamp(1.6rem,2.6vw,2.25rem)]">Gallery</h3>
+        <p className="s-label hidden sm:block">{images.length} photos</p>
+      </div>
+      <ul className="mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto px-[var(--s-gutter)] pb-4 [scrollbar-width:thin]">
+        {images.map((img) => (
+          <li key={img.id} className="shrink-0 snap-start">
             <button
-              key={img.id}
+              type="button"
               onClick={() => setActive(img)}
-              className="group relative aspect-square overflow-hidden rounded-xl bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-              aria-label={img.title ?? "View image"}
+              className="group relative block h-[min(60vh,26rem)] w-[min(78vw,22rem)] overflow-hidden rounded-[2px] border border-snow/10 bg-forest-900"
+              aria-label={`Open photo${img.title ? `: ${img.title}` : ""}`}
             >
               <Image
                 src={img.image}
-                alt={img.title ?? "Gallery image"}
+                alt={img.title ?? img.caption ?? "Gallery photo"}
                 fill
-                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                className="object-cover transition-transform duration-500 group-hover:scale-110"
-                priority={index < 4}
+                sizes="(max-width: 640px) 78vw, 22rem"
+                className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                {(img.title || img.caption) && (
-                  <div className="text-left">
-                    {img.title && (
-                      <p className="text-white font-semibold text-sm">{img.title}</p>
-                    )}
-                    {img.caption && (
-                      <p className="text-white/80 text-xs line-clamp-2">{img.caption}</p>
-                    )}
-                  </div>
-                )}
-              </div>
+              {img.title || img.caption ? (
+                <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-forest-950/90 to-transparent p-4 text-left text-sm text-snow opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                  {img.title ?? img.caption}
+                </span>
+              ) : null}
             </button>
-          ))}
-        </div>
-      </div>
+          </li>
+        ))}
+      </ul>
 
-      {/* Lightbox */}
       <Dialog open={Boolean(active)} onOpenChange={(open) => !open && setActive(null)}>
-        <DialogContent className="max-w-4xl p-0 overflow-hidden bg-background border-border">
-          {active && (
+        <DialogContent className="max-w-4xl overflow-hidden border-snow/10 bg-forest-950 p-0">
+          <DialogTitle className="sr-only">{active?.title ?? "Gallery photo"}</DialogTitle>
+          {active ? (
             <div>
-              <div className="relative w-full max-h-[80vh] flex items-center justify-center bg-black">
+              <div className="relative flex max-h-[80vh] w-full items-center justify-center bg-night">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={active.image}
-                  alt={active.title ?? "Gallery image"}
-                  className="max-h-[80vh] w-auto object-contain"
-                />
+                <img src={active.image} alt={active.title ?? "Gallery photo"} className="max-h-[80vh] w-auto object-contain" />
               </div>
-              {(active.title || active.caption) && (
+              {active.title || active.caption ? (
                 <div className="p-5">
-                  {active.title && (
-                    <h3 className="font-semibold text-foreground">{active.title}</h3>
-                  )}
-                  {active.caption && (
-                    <p className="text-muted-foreground text-sm mt-1">{active.caption}</p>
-                  )}
+                  {active.title ? <p className="font-medium text-snow">{active.title}</p> : null}
+                  {active.caption ? <p className="mt-1 text-sm text-sage">{active.caption}</p> : null}
                 </div>
-              )}
+              ) : null}
             </div>
-          )}
+          ) : null}
         </DialogContent>
       </Dialog>
-    </section>
+    </div>
   );
 };
 

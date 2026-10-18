@@ -1,136 +1,94 @@
-"use client";
-
-import { useState } from "react";
-import { Mail, Send, Loader2 } from "lucide-react";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { contactSchema } from "@/lib/validations";
+import type { CSSProperties } from "react";
+import SummitVista from "@/components/landscape/SummitVista";
+import type { Profile } from "@prisma/client";
+import { ArrowDownToLine, ArrowUpRight } from "lucide-react";
+import ContactForm from "@/components/summit/ContactForm";
+import CopyEmail from "@/components/summit/CopyEmail";
+import { FooterBar } from "@/components/sections/Footer";
+import { CTA } from "@/lib/sections";
+import { siteConfig } from "@/lib/site";
 
 interface ContactProps {
-  email?: string | null;
+  profile: Profile | null;
 }
 
-const Contact = ({ email }: ContactProps) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const contactEmail = email ?? "ronishprajapati0@gmail.com";
+const delay = (s: number) => ({ "--reveal-delay": `${s}s` }) as CSSProperties;
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-    const payload = {
-      name: String(formData.get("name") ?? ""),
-      email: String(formData.get("email") ?? ""),
-      message: String(formData.get("message") ?? ""),
-      website: String(formData.get("website") ?? ""), // honeypot
-    };
-
-    // Client-side validation mirrors the server schema.
-    const parsed = contactSchema.safeParse(payload);
-    if (!parsed.success) {
-      toast.error(parsed.error.issues[0]?.message ?? "Please check your input.");
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json().catch(() => ({}));
-
-      if (!res.ok) {
-        toast.error(data.error ?? "Something went wrong. Please try again.");
-        return;
-      }
-      toast.success("Message sent! I'll get back to you soon.");
-      form.reset();
-    } catch {
-      toast.error("Network error. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
+/** The summit: the mountain after sunrise, an invitation, and every way to reach out. */
+const Contact = ({ profile }: ContactProps) => {
+  const email = profile?.email ?? siteConfig.links.email;
+  const linkedin = profile?.linkedinUrl ?? siteConfig.links.linkedin;
+  const github = profile?.githubUrl ?? siteConfig.links.github;
+  const resume = profile?.resumeUrl ?? "/ronish-frontend.pdf";
 
   return (
-    <section id="contact" className="section-padding bg-background">
-      <div className="container-custom">
-        {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <p className="text-accent font-mono text-sm mb-3">Get In Touch</p>
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Let&apos;s work together
+    <section id="contact" aria-labelledby="contact-title" className="relative">
+      <SummitVista>
+        <div className="s-container pt-24 md:pt-28">
+          <h2 id="contact-title" className="s-display max-w-[12ch] text-[clamp(2.75rem,6.4vw,5.75rem)]">
+            <span data-reveal="mask" className="block overflow-hidden pb-[0.03em]">
+              <span className="block">Let&rsquo;s build something together</span>
+            </span>
           </h2>
-          <p className="text-muted-foreground">
-            Have a project in mind or just want to say hi? Drop me a message and I&apos;ll
-            respond as soon as I can.
+        </div>
+      </SummitVista>
+
+      <div className="s-container relative grid gap-x-16 gap-y-14 pb-24 pt-4 md:pb-32 lg:-mt-24 lg:grid-cols-12">
+        <div className="lg:col-span-6 lg:pt-28">
+          <p data-reveal className="max-w-[44ch] text-[clamp(1.15rem,1.6vw,1.35rem)] leading-relaxed text-fog">
+            I&apos;m currently looking for new opportunities. Whether you have a project in mind or just want to chat, feel free to reach out!
           </p>
+
+          <dl data-reveal style={delay(0.1)} className="mt-12 grid gap-x-10 gap-y-7 border-t border-snow/15 pt-8 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <dt className="s-label">Email</dt>
+              <dd className="mt-2 flex flex-wrap items-center gap-3">
+                <a href={`mailto:${email}`} className="s-link break-all text-[clamp(1.15rem,2vw,1.5rem)] font-medium">
+                  {email}
+                </a>
+                <CopyEmail email={email} />
+              </dd>
+            </div>
+            <div>
+              <dt className="s-label">Elsewhere</dt>
+              <dd className="mt-2 flex flex-wrap gap-x-6 gap-y-2">
+                <a href={linkedin} target="_blank" rel="noopener noreferrer" className="s-link">
+                  LinkedIn
+                  <ArrowUpRight className="h-4 w-4" data-nudge="right" aria-hidden />
+                  <span className="sr-only">(opens in a new tab)</span>
+                </a>
+                <a href={github} target="_blank" rel="noopener noreferrer" className="s-link">
+                  GitHub
+                  <ArrowUpRight className="h-4 w-4" data-nudge="right" aria-hidden />
+                  <span className="sr-only">(opens in a new tab)</span>
+                </a>
+              </dd>
+            </div>
+            <div>
+              <dt className="s-label">{CTA.resume}</dt>
+              <dd className="mt-2">
+                <a href={resume} target="_blank" rel="noopener noreferrer" className="s-link">
+                  <ArrowDownToLine className="h-4 w-4" aria-hidden />
+                  Download PDF
+                </a>
+              </dd>
+            </div>
+          </dl>
         </div>
 
-        <div className="max-w-xl mx-auto">
-          <form
-            onSubmit={handleSubmit}
-            className="bg-card rounded-2xl border border-border p-6 md:p-8 space-y-6"
+        <div className="lg:col-span-5 lg:col-start-8">
+          <div
+            data-reveal
+            style={delay(0.1)}
+            className="rounded-[2px] border border-snow/10 bg-forest-900/95 p-6 shadow-[0_40px_90px_-40px_rgb(var(--s-night))] md:p-10"
           >
-            <div className="grid gap-2">
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" name="name" placeholder="Your name" required />
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="you@example.com"
-                required
-              />
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="message">Message</Label>
-              <Textarea
-                id="message"
-                name="message"
-                placeholder="Tell me about your project…"
-                rows={5}
-                required
-              />
-            </div>
-
-            {/* Honeypot — hidden from humans, must stay empty */}
-            <div className="hidden" aria-hidden="true">
-              <label htmlFor="website">Website</label>
-              <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
-            </div>
-
-            <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="animate-spin" /> Sending…
-                </>
-              ) : (
-                <>
-                  <Send size={18} /> Send Message
-                </>
-              )}
-            </Button>
-
-            <p className="text-center text-sm text-muted-foreground">
-              Or email me directly at{" "}
-              <a href={`mailto:${contactEmail}`} className="text-accent hover:underline">
-                <Mail size={14} className="inline mb-0.5" /> {contactEmail}
-              </a>
-            </p>
-          </form>
+            <h3 className="s-title mb-8 text-[1.75rem]">Send a message</h3>
+            <ContactForm />
+          </div>
         </div>
       </div>
+
+      <FooterBar profile={profile} />
     </section>
   );
 };

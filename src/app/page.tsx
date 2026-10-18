@@ -1,13 +1,15 @@
 import Header from "@/components/sections/Header";
 import Hero from "@/components/sections/Hero";
-import About from "@/components/sections/About";
-import Experience from "@/components/sections/Experience";
+import Trailhead from "@/components/sections/Trailhead";
 import Projects from "@/components/sections/Projects";
-import Education from "@/components/sections/Education";
-import Gallery from "@/components/sections/Gallery";
+import Experience from "@/components/sections/Experience";
+import About from "@/components/sections/About";
+import TechTerrain from "@/components/sections/TechTerrain";
 import Testimonials from "@/components/sections/Testimonials";
 import Contact from "@/components/sections/Contact";
-import Footer from "@/components/sections/Footer";
+import RevealObserver from "@/components/summit/RevealObserver";
+import WaypointRail from "@/components/summit/WaypointRail";
+import { SECTIONS } from "@/lib/sections";
 import {
   getProfile,
   getProjects,
@@ -33,18 +35,27 @@ export default async function HomePage() {
       getTestimonials(),
     ]);
 
+  const waypoints = SECTIONS.filter((s) => s.id !== "testimonials" || testimonials.length > 0);
+
   return (
-    <main className="min-h-screen">
-      <Header email={profile?.email} />
+    <main className="summit s-grain min-h-screen">
+      <a
+        href="#trailhead"
+        className="sr-only z-[70] rounded-[2px] bg-ember px-4 py-2 font-medium text-forest-950 focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+      >
+        Skip to content
+      </a>
+      <Header email={profile?.email} resumeUrl={profile?.resumeUrl} variant="home" />
       <Hero profile={profile} />
-      <About profile={profile} skills={skills} />
-      <Experience experiences={experiences} resumeUrl={profile?.resumeUrl} />
+      <Trailhead profile={profile} experiences={experiences} />
       <Projects projects={projects} />
-      <Education education={education} />
-      <Gallery images={gallery} />
+      <Experience experiences={experiences} education={education} resumeUrl={profile?.resumeUrl} />
+      <About profile={profile} gallery={gallery} />
+      <TechTerrain profile={profile} skills={skills} projects={projects} experiences={experiences} />
       <Testimonials testimonials={testimonials} />
-      <Contact email={profile?.email} />
-      <Footer profile={profile} />
+      <Contact profile={profile} />
+      <WaypointRail sections={waypoints} />
+      <RevealObserver />
     </main>
   );
 }

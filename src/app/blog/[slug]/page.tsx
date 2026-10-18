@@ -71,59 +71,47 @@ export default async function BlogPostPage({
   };
 
   return (
-    <main className="min-h-screen bg-background">
-      <Header email={profile?.email} />
+    <main className="summit s-grain min-h-screen">
+      <Header email={profile?.email} resumeUrl={profile?.resumeUrl} />
 
-      <article className="pt-32 pb-16">
-        <div className="container-custom max-w-3xl">
-          <Link
-            href="/blog"
-            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8"
-          >
-            <ArrowLeft size={16} />
-            Back to Blog
+      <article className="pb-16 pt-32 md:pt-40">
+        <div className="s-container max-w-[52rem]">
+          <Link href="/blog" className="s-link text-sm text-sage hover:text-snow">
+            <ArrowLeft className="h-4 w-4" aria-hidden />
+            Back to the blog
           </Link>
 
-          <div className="flex items-center gap-4 text-sm text-muted-foreground font-mono mb-4">
-            <span className="flex items-center gap-1 text-accent">
-              <CalendarDays size={14} />
-              {formatDate(blog.createdAt)}
-            </span>
-            <span className="flex items-center gap-1">
-              <Clock size={14} />
+          <p className="s-label mt-10">
+            <CalendarDays className="mr-2 inline h-3.5 w-3.5 align-[-2px] text-ember" aria-hidden />
+            {formatDate(blog.createdAt)}
+            <span className="ml-4 text-sage/80">
+              <Clock className="mr-1.5 inline h-3.5 w-3.5 align-[-2px]" aria-hidden />
               {readingTime(blog.content)} min read
             </span>
-          </div>
+          </p>
 
-          <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-6 leading-tight">
-            {blog.title}
-          </h1>
+          <h1 className="s-title mt-5 text-[clamp(2.25rem,5vw,4rem)]">{blog.title}</h1>
 
-          {blog.excerpt && (
-            <p className="text-lg text-muted-foreground mb-8 leading-relaxed">{blog.excerpt}</p>
-          )}
+          {blog.excerpt ? <p className="mt-6 text-xl leading-relaxed text-fog">{blog.excerpt}</p> : null}
+        </div>
 
-          {blog.thumbnail && (
-            <div className="relative aspect-video w-full mb-12 rounded-2xl overflow-hidden shadow-elevated">
-              <Image
-                src={blog.thumbnail}
-                alt={blog.title}
-                fill
-                sizes="(max-width: 768px) 100vw, 768px"
-                className="object-cover"
-                priority
-              />
+        {blog.thumbnail ? (
+          <div className="s-container mt-12 max-w-[64rem]">
+            <div className="relative aspect-video w-full overflow-hidden rounded-[2px] border border-snow/10">
+              <Image src={blog.thumbnail} alt={blog.title} fill sizes="(max-width: 1024px) 100vw, 1024px" className="object-cover" priority />
             </div>
-          )}
+          </div>
+        ) : null}
 
+        <div className="s-container mt-14 max-w-[52rem]">
           {/* Content: render rich HTML if present, else plain-text paragraphs */}
           {looksLikeHtml(blog.content) ? (
             <div
-              className="prose prose-slate dark:prose-invert prose-headings:font-bold prose-a:text-accent max-w-none"
+              className="prose prose-invert prose-lg max-w-none prose-headings:font-display prose-headings:font-semibold prose-headings:text-snow prose-p:text-fog prose-a:text-ember prose-strong:text-snow prose-li:text-fog prose-blockquote:border-ember prose-img:rounded-[2px]"
               dangerouslySetInnerHTML={{ __html: blog.content }}
             />
           ) : (
-            <div className="prose prose-slate dark:prose-invert max-w-none">
+            <div className="prose prose-invert prose-lg max-w-none prose-p:text-fog">
               {blog.content.split(/\n{2,}/).map((paragraph, i) => (
                 <p key={i} className="whitespace-pre-line">
                   {paragraph}
@@ -139,29 +127,21 @@ export default async function BlogPostPage({
 
       {/* Related posts */}
       {related.length > 0 && (
-        <section className="section-padding bg-secondary">
-          <div className="container-custom">
-            <h2 className="text-2xl font-bold text-foreground mb-8">More posts</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {related.map((b) => (
-                <Link
-                  key={b.id}
-                  href={`/blog/${b.slug}`}
-                  className="group bg-card rounded-xl border border-border p-6 hover:shadow-soft transition-all"
-                >
-                  <span className="flex items-center gap-1 text-xs text-muted-foreground font-mono mb-2">
-                    <CalendarDays size={12} /> {formatDate(b.createdAt)}
-                  </span>
-                  <h3 className="text-lg font-semibold text-foreground group-hover:text-accent transition-colors line-clamp-2">
-                    {b.title}
-                  </h3>
-                  {b.excerpt && (
-                    <p className="text-muted-foreground text-sm mt-2 line-clamp-2">{b.excerpt}</p>
-                  )}
+        <section aria-labelledby="more-posts" className="s-container mt-10">
+          <h2 id="more-posts" className="s-label border-t border-snow/10 pt-10">
+            More posts
+          </h2>
+          <ul className="mt-6 grid gap-x-10 md:grid-cols-3">
+            {related.map((b) => (
+              <li key={b.id}>
+                <Link href={`/blog/${b.slug}`} className="group block border-t border-snow/10 py-6">
+                  <span className="s-label">{formatDate(b.createdAt)}</span>
+                  <span className="s-title mt-2 line-clamp-2 block text-xl transition-colors group-hover:text-ember">{b.title}</span>
+                  {b.excerpt ? <span className="mt-2 line-clamp-2 block text-sm text-sage">{b.excerpt}</span> : null}
                 </Link>
-              ))}
-            </div>
-          </div>
+              </li>
+            ))}
+          </ul>
         </section>
       )}
 

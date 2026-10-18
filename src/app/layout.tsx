@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DM_Sans, Space_Mono } from "next/font/google";
+import { Archivo, DM_Sans, Geist, Geist_Mono, Space_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -7,10 +7,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { siteConfig } from "@/lib/site";
 import { getProfile } from "@/lib/queries";
 
+// Admin panel fonts: loaded on demand only (not preloaded on public pages).
 const dmSans = DM_Sans({
   subsets: ["latin"],
   variable: "--font-sans",
   display: "swap",
+  preload: false,
 });
 
 const spaceMono = Space_Mono({
@@ -18,7 +20,36 @@ const spaceMono = Space_Mono({
   weight: ["400", "700"],
   variable: "--font-mono",
   display: "swap",
+  preload: false,
 });
+
+// Public site type system: condensed display, readable body, mono labels.
+const archivo = Archivo({
+  subsets: ["latin"],
+  axes: ["wdth"],
+  variable: "--font-display",
+  display: "swap",
+});
+
+const geist = Geist({
+  subsets: ["latin"],
+  variable: "--font-body",
+  display: "swap",
+});
+
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-label",
+  display: "swap",
+});
+
+// Runs before first paint: returning visitors in the same session get a short
+// hero fade instead of the full intro sequence.
+// data-js lets CSS hold the hero intro until its layers load; the timer is a
+// safety net in case hydration never happens. A direct link to a section
+// (/#contact) jumps there instead of gliding down the whole page; smooth
+// scrolling resumes for in-page clicks once loaded.
+const introScript = `(function(){var d=document.documentElement;d.dataset.js="1";try{if(sessionStorage.getItem("summit-intro"))d.dataset.intro="seen"}catch(e){}setTimeout(function(){d.dataset.heroReady="1"},4000);if(location.hash){d.style.scrollBehavior="auto";addEventListener("load",function(){setTimeout(function(){d.style.scrollBehavior=""},100)})}})()`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -125,7 +156,14 @@ export default async function RootLayout({
   };
 
   return (
-    <html lang="en" className={`${dmSans.variable} ${spaceMono.variable}`}>
+    <html
+      lang="en"
+      className={`${dmSans.variable} ${spaceMono.variable} ${archivo.variable} ${geist.variable} ${geistMono.variable}`}
+      suppressHydrationWarning
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: introScript }} />
+      </head>
       <body className="font-sans antialiased">
         <TooltipProvider>
           {children}

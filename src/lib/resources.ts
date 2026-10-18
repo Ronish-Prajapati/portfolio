@@ -72,6 +72,12 @@ export const resources: Record<string, ResourceConfig> = {
       { name: "longDescription", label: "Long Description", type: "richtext", required: true },
       { name: "image", label: "Cover Image", type: "image" },
       {
+        name: "role",
+        label: "My Role",
+        type: "text",
+        help: "One sentence on what you did, e.g. \"Frontend: dashboard and reporting UI\". Shown on the homepage.",
+      },
+      {
         name: "technologies",
         label: "Technologies",
         type: "list",

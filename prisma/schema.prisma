@@ -47,6 +47,8 @@ model Project {
   image           String?
   githubLink      String?
   liveLink        String?
+  // Optional one-line summary of my role/contribution on the project.
+  role            String?
   technologies    String[] @default([])
   features        String[] @default([])
   year            String?

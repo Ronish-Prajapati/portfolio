@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Calendar, MapPin, CheckCircle2, Briefcase } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import Header from "@/components/sections/Header";
 import Footer from "@/components/sections/Footer";
 import { getExperienceById, getExperiences, getProfile } from "@/lib/queries";
+import { stripHtml } from "@/lib/format";
 
 export const revalidate = 3600;
 export const dynamicParams = true;
@@ -45,155 +46,108 @@ export default async function ExperienceDetailPage({
   if (!experience) notFound();
 
   const otherExperiences = allExperiences.filter((e) => e.id !== experience.id).slice(0, 2);
+  const details = [
+    { label: "Position", value: experience.position },
+    { label: "Company", value: experience.company },
+    { label: "Duration", value: experience.period },
+    { label: "Location", value: experience.location },
+  ].filter((d): d is { label: string; value: string } => Boolean(d.value));
 
   return (
-    <main className="min-h-screen bg-background">
-      <Header email={profile?.email} />
+    <main className="summit s-grain min-h-screen">
+      <Header email={profile?.email} resumeUrl={profile?.resumeUrl} />
 
-      {/* Hero Section */}
-      <section className="pt-32 pb-16 bg-hero">
-        <div className="container-custom">
-          <Link
-            href="/#experience"
-            className="inline-flex items-center gap-2 text-hero-muted hover:text-hero-foreground transition-colors mb-8"
-          >
-            <ArrowLeft size={16} />
-            Back to Experience
+      <article>
+        <header className="s-container pb-16 pt-32 md:pt-40">
+          <Link href="/#experience" className="s-link text-sm text-sage hover:text-snow">
+            <ArrowLeft className="h-4 w-4" aria-hidden />
+            Back to the climb
           </Link>
-
-          <div className="max-w-3xl">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-16 h-16 bg-accent/20 rounded-2xl flex items-center justify-center">
-                <Briefcase className="w-8 h-8 text-accent" />
-              </div>
-              <div>
-                <h1 className="text-3xl md:text-4xl font-bold text-hero-foreground">
-                  {experience.position}
-                </h1>
-                <p className="text-xl text-accent">{experience.company}</p>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-6 text-hero-muted">
-              {experience.period && (
-                <span className="flex items-center gap-2">
-                  <Calendar size={16} />
-                  {experience.period}
-                </span>
-              )}
-              {experience.location && (
-                <span className="flex items-center gap-2">
-                  <MapPin size={16} />
-                  {experience.location}
-                </span>
-              )}
-            </div>
+          <div className="mt-10 flex flex-wrap items-center gap-x-4 gap-y-1">
+            {experience.period ? <span className="s-label text-fog">{experience.period}</span> : null}
+            {experience.location ? <span className="s-label">{experience.location}</span> : null}
+            {experience.current ? (
+              <span className="rounded-[2px] border border-ember/50 px-1.5 py-0.5 font-label text-[0.65rem] uppercase tracking-[0.14em] text-ember">
+                Current
+              </span>
+            ) : null}
           </div>
-        </div>
-      </section>
+          <h1 className="s-title mt-5 max-w-[22ch] text-[clamp(2.4rem,5.2vw,4.75rem)]">{experience.position}</h1>
+          <p className="mt-3 text-xl text-fog">{experience.company}</p>
+        </header>
 
-      {/* Details Section */}
-      <section className="section-padding">
-        <div className="container-custom">
-          <div className="grid lg:grid-cols-3 gap-12">
-            {/* Main Content */}
-            <div className="lg:col-span-2">
-              <h2 className="text-2xl font-bold text-foreground mb-6">Role Overview</h2>
-              <p className="text-muted-foreground leading-relaxed mb-10">
-                {experience.description}
-              </p>
+        <div className="s-container grid gap-16 border-t border-snow/10 py-16 md:py-24 lg:grid-cols-12">
+          <div className="lg:col-span-7">
+            <h2 className="s-title text-[clamp(1.75rem,2.6vw,2.25rem)]">Role overview</h2>
+            <p className="s-prose mt-6">{stripHtml(experience.description)}</p>
 
-              {experience.highlights.length > 0 && (
-                <>
-                  <h3 className="text-xl font-semibold text-foreground mb-6">
-                    Key Achievements
-                  </h3>
-                  <ul className="space-y-4">
-                    {experience.highlights.map((highlight, index) => (
-                      <li key={index} className="flex items-start gap-3">
-                        <CheckCircle2 className="w-5 h-5 text-accent mt-0.5 flex-shrink-0" />
-                        <span className="text-muted-foreground">{highlight}</span>
+            {experience.highlights.length > 0 ? (
+              <>
+                <h2 className="s-title mt-16 text-[clamp(1.75rem,2.6vw,2.25rem)]">Key achievements</h2>
+                <ul className="mt-6 grid">
+                  {experience.highlights.map((highlight, index) => (
+                    <li key={index} className="flex gap-4 border-t border-snow/10 py-4 leading-relaxed text-fog">
+                      <span aria-hidden className="mt-[0.75em] h-px w-3 shrink-0 bg-ember" />
+                      {highlight}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : null}
+          </div>
+
+          <aside className="lg:col-span-4 lg:col-start-9">
+            <div className="lg:sticky lg:top-28">
+              {experience.technologies.length > 0 ? (
+                <div className="border-t border-snow/10 py-5">
+                  <h2 className="s-label">Technologies used</h2>
+                  <ul className="mt-3 flex flex-wrap gap-2">
+                    {experience.technologies.map((tech) => (
+                      <li key={tech} className="s-chip">
+                        {tech}
                       </li>
                     ))}
                   </ul>
-                </>
-              )}
-            </div>
-
-            {/* Sidebar */}
-            <div>
-              <div className="bg-secondary rounded-xl p-6 sticky top-24">
-                <h3 className="font-semibold text-foreground mb-4">Technologies Used</h3>
-                <div className="flex flex-wrap gap-2">
-                  {experience.technologies.map((tech) => (
-                    <span
-                      key={tech}
-                      className="px-3 py-1.5 bg-background text-foreground text-sm rounded-full border border-border"
-                    >
-                      {tech}
-                    </span>
+                </div>
+              ) : null}
+              <div className="border-t border-snow/10 py-5">
+                <h2 className="s-label">Employment details</h2>
+                <dl>
+                  {details.map((d) => (
+                    <div key={d.label} className="mt-4">
+                      <dt className="text-sm text-sage">{d.label}</dt>
+                      <dd className="text-snow">{d.value}</dd>
+                    </div>
                   ))}
-                </div>
-
-                <div className="border-t border-border mt-6 pt-6">
-                  <h3 className="font-semibold text-foreground mb-4">Employment Details</h3>
-                  <dl className="space-y-3 text-sm">
-                    <div>
-                      <dt className="text-muted-foreground">Position</dt>
-                      <dd className="text-foreground font-medium">{experience.position}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-muted-foreground">Company</dt>
-                      <dd className="text-foreground font-medium">{experience.company}</dd>
-                    </div>
-                    {experience.period && (
-                      <div>
-                        <dt className="text-muted-foreground">Duration</dt>
-                        <dd className="text-foreground font-medium">{experience.period}</dd>
-                      </div>
-                    )}
-                    {experience.location && (
-                      <div>
-                        <dt className="text-muted-foreground">Location</dt>
-                        <dd className="text-foreground font-medium">{experience.location}</dd>
-                      </div>
-                    )}
-                  </dl>
-                </div>
+                </dl>
               </div>
             </div>
-          </div>
+          </aside>
         </div>
-      </section>
+      </article>
 
-      {/* Other Experience */}
-      {otherExperiences.length > 0 && (
-        <section className="section-padding bg-secondary">
-          <div className="container-custom">
-            <h2 className="text-2xl font-bold text-foreground mb-8">Other Experience</h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              {otherExperiences.map((otherExp) => (
-                <Link
-                  key={otherExp.id}
-                  href={`/experience/${otherExp.id}`}
-                  className="group bg-card rounded-xl border border-border p-6 hover:shadow-soft transition-all"
-                >
-                  <span className="text-xs text-muted-foreground font-mono">
-                    {otherExp.period}
+      {otherExperiences.length > 0 ? (
+        <section aria-labelledby="other-title" className="s-container">
+          <h2 id="other-title" className="s-label border-t border-snow/10 pt-10">
+            Other roles
+          </h2>
+          <ul className="mt-6 grid gap-x-12 md:grid-cols-2">
+            {otherExperiences.map((other) => (
+              <li key={other.id}>
+                <Link href={`/experience/${other.id}`} className="group block border-t border-snow/10 py-6">
+                  {other.period ? <span className="s-label">{other.period}</span> : null}
+                  <span className="s-title mt-2 block text-2xl transition-colors group-hover:text-ember">{other.position}</span>
+                  <span className="mt-1 block text-fog">{other.company}</span>
+                  <span className="s-link mt-4 text-sm">
+                    Role details
+                    <ArrowRight className="h-4 w-4" data-nudge="right" aria-hidden />
                   </span>
-                  <h3 className="text-xl font-semibold text-foreground mt-1 mb-1 group-hover:text-accent transition-colors">
-                    {otherExp.position}
-                  </h3>
-                  <p className="text-accent text-sm mb-2">{otherExp.company}</p>
-                  <p className="text-muted-foreground text-sm line-clamp-2">
-                    {otherExp.description}
-                  </p>
                 </Link>
-              ))}
-            </div>
-          </div>
+              </li>
+            ))}
+          </ul>
         </section>
-      )}
+      ) : null}
 
       <Footer profile={profile} />
     </main>
